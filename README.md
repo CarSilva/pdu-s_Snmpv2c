@@ -1,1 +1,1 @@
-# pdu-s_Snmpv2c
+# PDUs SNMPv2c -- Encoding and decoding
