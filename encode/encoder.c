@@ -1,5 +1,20 @@
 #include <stdio.h>
-#include <setRequest.h>
+#include <stdint.h>
+#include <SimpleSyntax.h>
+#include <ObjectSyntax.h>
+#include <SetRequest-PDU.h>
+#include <PDUs.h>
+#include <ANY.h>
+#include <Message.h>
+#include <asn_application.h>
+#include <asn_bit_data.h>
+#include <string.h>
+#include <simpleSyntax.h>
+#include <applicationSyntax.h>
+#include <objectSyntax.h>
+#include <setRequestPDU.h>
+#include <message.h>
+
 
 int main() {
   //Exemplo simples para setRequest
@@ -10,53 +25,42 @@ int main() {
 
   ObjectSyntax_t* object_syntax;
   object_syntax = calloc(1, sizeof(ObjectSyntax_t));
-  object_syntax = object_c_simple(simple, object_syntax);
+  object_syntax = object_create_simple(simple, object_syntax);
 
+  //arranjar maneira de string->uint8_t, assim acho que isto nao está bem.
+  uint8_t* name;
+  name = "1.2.3.4.0";
   SetRequest_PDU_t* setRequestPDU;
-  setRequestPDU = calloc(1, sizeof(GetRequest_PDU_t));
-  setRequestPDU =  setRequestPdu_create(object_syntax, name, name_size, setRequestPDU, requestID);
+  setRequestPDU = calloc(1, sizeof(SetRequest_PDU_t));
+  setRequestPDU =  setRequestPdu_create(object_syntax, name, sizeof(name), setRequestPDU, 1);
 
-  PDUs_t *pdu;
+  PDUs_t* pdu;
   pdu = calloc(1, sizeof(PDUs_t));
   pdu = create_pdu(setRequestPDU, pdu);
 
-  uint8_t *buffer;
-  buffer = calloc(1, sizeof(uint8_t));
+  uint8_t* buffer;
+  buffer = calloc(1024, sizeof(uint8_t));
   asn_enc_rval_t ret = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_PDUs, pdu,
-                                            buffer, 1);
+                                            buffer, sizeof(buffer));
 
-  ANY_t *data;
+  ANY_t* data;
   data = calloc(1, sizeof(ANY_t));
   data = create_data(buffer, ret, data);
 
+  //arranjar maneira de "public"-> OCTET_STRING_t, assim acho que isto nao está bem.
   Message_t* message;
+  OCTET_STRING_t community;
   message = calloc(1, sizeof(Message_t));
-  message = create_message(data, version, community, message)
+  message = create_message(data, 2, community, message);
 
   uint8_t *buffer_final;
-  buffer_final = calloc(1, sizeof(uint8_t));
+  buffer_final = calloc(1024, sizeof(uint8_t));
   asn_enc_rval_t ret2 = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_Message, message,
-                                             buffer_final, buffer_final_size);
-  printf(buffer_final);
+                                             buffer_final, sizeof(buffer_final));
+
+  printf("%02x %02x %02x %02x %02x %02x\n",
+            buffer_final[0] & 0xff, buffer_final[1] & 0xff, buffer_final[2] & 0xff,
+            buffer_final[3] & 0xff, buffer_final[4] & 0xff, buffer_final[5] & 0xff);
+
   return 0;
-}
-
-
-PDUs_t* create_pdu(SetRequest_PDU_t* setRequestPDU, PDUs_t *pdu) {
-  pdu->present = PDUs_PR_set_request;
-  pdu->choice.set_request = *setRequestPDU;
-  return pdu;
-}
-
-ANY_t* create_data(uint8_t *buffer, asn_enc_rval_t ret, ANY_t *data){
-  data->buf = buffer;
-  data->size = ret.encoded;
-  return data;
-}
-
-Message_t* create_message(ANY_t* data, long version, OCTECT_STRING_t community, Message_t* message) {
-  message->version = version;
-  message->community = community;
-  message->data = *data;
-  return message;
 }
