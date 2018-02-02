@@ -3,12 +3,15 @@
 #include <SetRequest-PDU.h>
 #include <ObjectSyntax.h>
 
-SetRequest_PDU_t* setRequestPdu_create(ObjectSyntax_t* object_syntax, uint8_t* name, size_t name_size,
+SetRequest_PDU_t* setRequestPdu_create(ObjectSyntax_t* object_syntax, const char* oid,
                                       SetRequest_PDU_t* setRequestPDU, int requestID) {
+  uint8_t* name;
+  name = calloc(1024, sizeof(uint8_t));
+  name = (uint8_t*) oid;
   ObjectName_t* object_name;
   object_name = calloc(1, sizeof(ObjectName_t));
   object_name->buf = name;
-  object_name->size = name_size;
+  object_name->size = sizeof(name);
   VarBind_t* var_bind;
   var_bind = calloc(1, sizeof(VarBind_t));
   var_bind->name = *object_name;

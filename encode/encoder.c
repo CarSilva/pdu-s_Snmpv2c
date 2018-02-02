@@ -29,11 +29,9 @@ int main() {
   object_syntax = object_create_simple(simple, object_syntax);
 
   //arranjar maneira de string->uint8_t, assim acho que isto nao está bem.
-  uint8_t* name;
-  name = "1.2.3.4.0";
   SetRequest_PDU_t* setRequestPDU;
   setRequestPDU = calloc(1, sizeof(SetRequest_PDU_t));
-  setRequestPDU =  setRequestPdu_create(object_syntax, name, sizeof(name), setRequestPDU, 1);
+  setRequestPDU =  setRequestPdu_create(object_syntax, "1.2.3.4.0", setRequestPDU, 1);
 
   PDUs_t* pdu;
   pdu = calloc(1, sizeof(PDUs_t));
@@ -66,8 +64,8 @@ int main() {
 
   /*TESTE DECODE
 
-  Message_t *messaged = 0;
-    
+    Message_t *messaged = 0;
+
     asn_dec_rval_t rval1 = asn_decode(0, ATS_BER, &asn_DEF_Message,
                                     (void **)&messaged, buffer_final, sizeof(buffer_final)); //tratar erro se der -1
     if(rval1.code ==  RC_FAIL){ //significa que a descodificaçaºo falhou, está a entrar no if nao sei bem porque
@@ -91,7 +89,8 @@ int main() {
     ObjectSyntax_t* object_syntaxd = &(var_bindd->choice.choice.value);
     printf("Object-name-> buf  = %s\n", object_named->buf);
 
-    */
-  
+
+
   return 0;
+  */
 }
