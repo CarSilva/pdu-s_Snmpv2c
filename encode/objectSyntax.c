@@ -12,8 +12,8 @@ ObjectSyntax_t* object_create_application(ApplicationSyntax_t* application_wide,
   return object_syntax;
 }
 
-ObjectSyntax_t* create_object(int flag, SimpleSyntax_t* simple, ApplicationSyntax_t* application_wide) {
-  ObjectSyntax_t* object_syntax;
+ObjectSyntax_t* create_object(int flag, SimpleSyntax_t* simple, ApplicationSyntax_t* application_wide,
+                              ObjectSyntax_t* object_syntax) {
   object_syntax = calloc(1, sizeof(ObjectSyntax_t));
   if (flag >=1 && flag <=3) {
     object_syntax = object_create_simple(simple, object_syntax);

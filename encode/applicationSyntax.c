@@ -38,8 +38,7 @@ ApplicationSyntax_t* insert_unsigned_integer_value(Unsigned32_t value, Applicati
   return application;
 }
 
-ApplicationSyntax_t* create_application(int flag, const char* string) {
-  ApplicationSyntax_t* application;
+ApplicationSyntax_t* create_application(int flag, const char* string, ApplicationSyntax_t* application) {
   unsigned long value;
   long valueLong;
   OCTET_STRING_t *str;

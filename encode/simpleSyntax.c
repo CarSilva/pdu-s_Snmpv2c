@@ -43,8 +43,7 @@ OBJECT_IDENTIFIER_t* encode_OID(OBJECT_IDENTIFIER_t *oid, const char *oid_text) 
   return oid;
 }
 
-SimpleSyntax_t* create_simple(int flag, const char* string) {
-  SimpleSyntax_t* simple;
+SimpleSyntax_t* create_simple(int flag, const char* string, SimpleSyntax_t* simple) {
   long value;
   OCTET_STRING_t *str;
   OBJECT_IDENTIFIER_t *oid;

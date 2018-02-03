@@ -15,51 +15,58 @@
 #include <objectSyntax.h>
 #include <setRequestPDU.h>
 #include <message.h>
+#include <fcntl.h>
+#include <stdio.h>
 
 
-int main() {
-  //Exemplo simples para setRequest
-  //Substituir nomes de algumas variáveis por o valor real
-  SimpleSyntax_t* simple;
-  simple = calloc(1, sizeof(SimpleSyntax_t));
-  simple = insert_value(1, simple);
-
+uint8_t* setRequest(const char* flag, const char* version, const char* community, const char* tag,
+                    const char* oid, const char* value, uint8_t *buffer_final) {
+  FILE* fout = stdout;
   ObjectSyntax_t* object_syntax;
-  object_syntax = calloc(1, sizeof(ObjectSyntax_t));
-  object_syntax = object_create_simple(simple, object_syntax);
-
-  //arranjar maneira de string->uint8_t, assim acho que isto nao está bem.
   SetRequest_PDU_t* setRequestPDU;
-  setRequestPDU = calloc(1, sizeof(SetRequest_PDU_t));
-  setRequestPDU =  setRequestPdu_create(object_syntax, "1.2.3.4.0", setRequestPDU, 1);
-
   PDUs_t* pdu;
-  pdu = calloc(1, sizeof(PDUs_t));
-  pdu = create_pdu(setRequestPDU, pdu);
-
   uint8_t* buffer;
+  ANY_t* data;
+  Message_t* message;
+  int f = atoi(flag);
+  int t = atoi(tag);
+  if (f >=1 && f <=3) {
+    SimpleSyntax_t* simple;
+    simple = create_simple(f, value, simple);
+    object_syntax = create_object(f, simple, NULL, object_syntax);
+  }
+  else if (f >=4 && f <=9) {
+    ApplicationSyntax_t* application;
+    application = create_application(f, value, application);
+    object_syntax = create_object(f, NULL, application, object_syntax);
+  }
+  else {
+    printf("%s\n", "Erro Erro!");
+  }
+  setRequestPDU =  setRequestPdu_create(object_syntax, oid, setRequestPDU, tag);
+  pdu = create_pdu(setRequestPDU, pdu);
   buffer = calloc(1024, sizeof(uint8_t));
   asn_enc_rval_t ret = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_PDUs, pdu,
                                             buffer, sizeof(buffer));
-
-  ANY_t* data;
-  data = calloc(1, sizeof(ANY_t));
   data = create_data(buffer, ret, data);
-
-  //arranjar maneira de "public"-> OCTET_STRING_t, assim acho que isto nao está bem.
-  Message_t* message;
-  OCTET_STRING_t community;
-  message = calloc(1, sizeof(Message_t));
-  message = create_message(data, 2, community, message);
-
-  uint8_t *buffer_final;
+  message = create_message(data, version, community, message);
   buffer_final = calloc(1024, sizeof(uint8_t));
   asn_enc_rval_t ret2 = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_Message, message,
                                              buffer_final, sizeof(buffer_final));
+  printf("Codificação mensagem:\n");
+  xer_fprint(fout, &asn_DEF_Message, message);
+  return buffer_final;
+}
 
-  printf("%02x %02x %02x %02x %02x %02x\n",
-            buffer_final[0] & 0xff, buffer_final[1] & 0xff, buffer_final[2] & 0xff,
-            buffer_final[3] & 0xff, buffer_final[4] & 0xff, buffer_final[5] & 0xff);
+int main() {
+  uint8_t *buffer_final;
+  buffer_final = setRequest("2","ola","public","0", "1.2.3.4.0", "1", buffer_final);
+  printf("Tamanho do buffer final: %d\n", sizeof(buffer_final));
+  printf("Codificação buffer final: \n%02x %02x %02x %02x %02x %02x %02x %02x\n",
+         buffer_final[0] & 0xff, buffer_final[1] & 0xff, buffer_final[2] & 0xff,
+         buffer_final[3] & 0xff, buffer_final[4] & 0xff, buffer_final[5] & 0xff,
+         buffer_final[6] & 0xff, buffer_final[7]);
+
 
 
   /*TESTE DECODE
@@ -93,4 +100,5 @@ int main() {
 
   return 0;
   */
+
 }

@@ -13,6 +13,6 @@ ApplicationSyntax_t* insert_big_counter_value(Counter64_t *value, ApplicationSyn
 
 ApplicationSyntax_t* insert_unsigned_integer_value(Unsigned32_t value, ApplicationSyntax_t* application);
 
-ApplicationSyntax_t* create_application(int flag, const char* string);
+ApplicationSyntax_t* create_application(int flag, const char* string, ApplicationSyntax_t* application);
 
 #endif
