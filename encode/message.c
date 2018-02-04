@@ -2,13 +2,6 @@
 #include <ANY.h>
 #include <Message.h>
 
-PDUs_t* create_pdu(SetRequest_PDU_t* setRequestPDU, PDUs_t *pdu) {
-  pdu = calloc(1, sizeof(PDUs_t));
-  pdu->present = PDUs_PR_set_request;
-  pdu->choice.set_request = *setRequestPDU;
-  return pdu;
-}
-
 ANY_t* create_data(uint8_t *buffer, asn_enc_rval_t ret, ANY_t *data){
   data = calloc(1, sizeof(ANY_t));
   data->buf = buffer;
