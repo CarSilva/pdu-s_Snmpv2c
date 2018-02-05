@@ -4,10 +4,16 @@
 #include <Message.h>
 #include <PDUs.h>
 
-PDUs_t *buffer_to_PDU(uint8_t *buffer_final);
+typedef struct pdu_info{
+	PDUs_t *pdu;
+	char *version;
+	char *comm;	
+}Pdu_Info;
 
-const char *getVersion(Message_t *message);
-const char *getComm(Message_t *message);
+Pdu_Info *buffer_to_PDU(uint8_t *buffer_final);
+
+char *getVersion(Message_t *message);
+char *getComm(Message_t *message);
 
 
 #endif

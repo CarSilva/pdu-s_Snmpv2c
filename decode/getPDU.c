@@ -1,9 +1,11 @@
 #include <Message.h>
 #include <PDUs.h>
+#include <getPDU.h>
 
 
-PDUs_t *buffer_to_PDU(uint8_t *buffer_final){
+Pdu_Info *buffer_to_PDU(uint8_t *buffer_final){
 	Message_t *message = calloc(1, sizeof(Message_t));
+	printf("%d\n", message->data.size);
 	asn_dec_rval_t rval1 = asn_decode(0, ATS_BER, &asn_DEF_Message,
                                     (void **)&message, buffer_final, sizeof(buffer_final));
 	switch(rval1.code){
@@ -19,15 +21,23 @@ PDUs_t *buffer_to_PDU(uint8_t *buffer_final){
 		case RC_WMORE:
 			return NULL;
 	}
-    return pdu;
+	Pdu_Info *info = malloc(sizeof(struct pdu_info));
+	info->pdu = pdu;
+	info->version = getVersion(message);
+	info->comm = getComm(message);
+    return info;
 }
 
-const char *getVersion(Message_t *message){
-	return (const char *)message->version;
+char *getVersion(Message_t *message){
+	return (char *)message->version;
 }
 
-OCTET_STRING_t getComm(Message_t *message){
-	return message->community;
+char * getComm(Message_t *message){
+	char *str = (char *) message->community.buf;
+	char *final = malloc(1024);
+
+	snprintf(final, 1024, "%s%c", str, '\0');
+	return final;
 }
 
 
