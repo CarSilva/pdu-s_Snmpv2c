@@ -18,6 +18,9 @@ void parseSimple(SimpleSyntax_t *simple, Pdu_Field *field){
 		case SimpleSyntax_PR_objectID_value:
 			field->present = OID;
 			field->fields.oid = simple->choice.objectID_value;
+			break;
+		case SimpleSyntax_PR_NOTHING:
+			field->present = Nothing;
 	}
 }
 
@@ -46,6 +49,10 @@ void parseApplicationSyntax(ApplicationSyntax_t *appSyn, Pdu_Field *field){
 		case ApplicationSyntax_PR_unsigned_integer_value:
 			field->present = Unsign32;
 			field->fields.unsign32 = appSyn->choice.unsigned_integer_value;
+			break;
+		case ApplicationSyntax_PR_NOTHING:
+			field->present = Nothing;
+
 	}
 }
 
@@ -65,10 +72,44 @@ Pdu_Field getObjectSyntax(VarBind_t *var_bind, Pdu_Field *field){
 	}
 }
 
-VarBind_t *getVarBind(PDUs_t *pdu){
 
-    VarBindList_t var_bindings = pdu->choice.set_request.variable_bindings;
-    VarBind_t* var_bind = var_bindings.list.array[0];
+VarBind_t *getVarBind(PDUs_t *pdu){
+	VarBindList_t var_bindings;
+	VarBind_t* var_bind;
+	switch(pdu->present){
+		case PDUs_PR_get_request:
+			var_bindings = pdu->choice.get_request.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;
+		case PDUs_PR_get_next_request:
+			var_bindings = pdu->choice.get_next_request.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;
+		case PDUs_PR_get_bulk_request:
+			var_bindings = pdu->choice.get_bulk_request.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;
+		case PDUs_PR_response:
+			var_bindings = pdu->choice.response.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;
+		case PDUs_PR_set_request:
+			var_bindings = pdu->choice.set_request.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;
+		case PDUs_PR_inform_request:
+			var_bindings = pdu->choice.inform_request.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;	
+		case PDUs_PR_snmpV2_trap:
+			var_bindings = pdu->choice.snmpV2_trap.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;	
+		case PDUs_PR_report:
+			var_bindings = pdu->choice.report.variable_bindings;
+			var_bind = var_bindings.list.array[0];
+			break;
+	}	
 
     return var_bind;
 }
