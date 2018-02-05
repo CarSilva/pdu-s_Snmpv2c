@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <ObjectName.h>
 
-uint8_t* fill_oid(char*, uint8_t*);
+int fill_oid(char*, uint8_t*);
 
 ObjectName_t* create_object_name(ObjectName_t*, char*);
 

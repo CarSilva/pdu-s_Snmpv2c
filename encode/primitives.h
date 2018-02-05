@@ -26,7 +26,7 @@ long getNextRequest(long, char*, long, char**, uint8_t*);
 
 long getBulkRequest(long, char*, long, char**,long, long, uint8_t*);
 
-long response(int[], long, char*, long, char**, long,long, char**, uint8_t*);
+long response(int[], long, char*, long, char**, long, long, char**, int, int, int, int, uint8_t[]);
 
 long setRequest(int[], long, char*, long, char**, char**, uint8_t *);
 

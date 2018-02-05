@@ -4,8 +4,9 @@
 VarBind_t* add_oid_to_varbind(char* oid, VarBind_t* var_bind) {
   ObjectName_t* object_name;
   object_name = create_object_name(object_name, oid);
-  var_bind = calloc(1, sizeof(VarBind_t));
+  var_bind = malloc(sizeof(VarBind_t));
   var_bind->name = *object_name;
+  return var_bind;
 }
 
 VarBind_t* create_varbind_value(ObjectSyntax_t* object_syntax, char* oid, VarBind_t* var_bind) {

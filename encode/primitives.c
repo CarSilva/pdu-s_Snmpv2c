@@ -36,14 +36,22 @@ long encoding(PDUs_t* pdu, long version, char* community, uint8_t buffer_final[]
   uint8_t buffer[1024];
   ANY_t* data;
   Message_t* message;
+  //teste
+  printf("PUD: \n\n");
   xer_fprint(fout, &asn_DEF_PDUs, pdu);
+  printf("\n\nEND PUD: \n\n");
+  //end teste
   asn_enc_rval_t ret = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_PDUs, pdu,
                                             buffer, 1024);
+  printf("%ld\n", ret.encoded);
   data = create_data(buffer, ret, data);
   message = create_message(data, version, community, message);
   asn_enc_rval_t ret2 = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_Message, message,
                                              buffer_final, 1024);
+  printf("%ld\n", ret2.encoded);
+  //teste
   //xer_fprint(fout, &asn_DEF_Message, message);
+  //end teste
   return ret2.encoded;
 }
 
@@ -74,7 +82,6 @@ long getRequest(long version, char* community, long tag, char** oid, uint8_t buf
 }
 
 //id = 2
-
 long getNextRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
   int size, i;
   long n;
@@ -103,7 +110,7 @@ long getNextRequest(long version, char* community, long tag, char** oid, uint8_t
 
 //id = 3
 long getBulkRequest(long version, char* community, long tag, char** oid,
-                        long non_repeaters, long	max_repetitions, uint8_t buffer_final[]) {
+                    long non_repeaters, long	max_repetitions, uint8_t buffer_final[]) {
   int size, i;
   long n;
   size = sizeArray(oid);
@@ -132,7 +139,8 @@ long getBulkRequest(long version, char* community, long tag, char** oid,
 //id = 4
 
 long response(int flag[], long version, char* community, long tag, char**oid, long error_status,
-                  long index_error, char** value, uint8_t buffer_final[]) {
+              long index_error, char** value, int unSpecified, int noSuchObject, int noSuchInstance,
+            	int endOfMibView, uint8_t buffer_final[]) {
   int size, i;
   long n;
   size = sizeArray(value);
@@ -142,16 +150,32 @@ long response(int flag[], long version, char* community, long tag, char**oid, lo
   VarBindList_t* varlist;
   Response_PDU_t* ResponsePDU;
   PDUs_t* pdu;
-  while(i != size) {
-    object_syntax = decide_object(flag[i], value[i], object_syntax);
-    var_bind = create_varbind_value(object_syntax, oid[i], var_bind);
-    if(i == 0) {
-      varlist = create_varBindList(var_bind, varlist);
+  if(size == 0) {
+    if (unSpecified != 0) {
+      var_bind = create_varbind_unspecified(oid[0], var_bind);
+    }
+    else if(noSuchObject != 0) {
+      var_bind = create_varbind_noSuchObject(oid[0], var_bind);
+    }
+    else if(noSuchInstance != 0) {
+      var_bind = create_varbind_noSuchInstance(oid[0], var_bind);
     }
     else {
-      varlist = add_to_varBindList(var_bind, varlist);
+      var_bind = create_varbind_endOfMibView(oid[0], var_bind);
     }
-    i++;
+  }
+  else {
+    while(i != size) {
+      object_syntax = decide_object(flag[i], value[i], object_syntax);
+      var_bind = create_varbind_value(object_syntax, oid[i], var_bind);
+      if(i == 0) {
+        varlist = create_varBindList(var_bind, varlist);
+      }
+      else {
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      i++;
+    }
   }
   ResponsePDU = create_pdu(ResponsePDU, tag, error_status, index_error, varlist);
   pdu = create_response_pdu(pdu, ResponsePDU);
@@ -188,12 +212,28 @@ long setRequest(int flag[], long version, char* community, long tag,
   return n;
 }
 
-/*
-InformRequest
-Trap
-
-PDU is sent is specified by the notification originator application.  The first two variable
-bindings in the variable binding list of an InformRequest-PDU are
-sysUpTime.0 [RFC3418] and snmpTrapOID.0
-*/
 //id = 6
+long InformRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
+  int size, i;
+  long n;
+  size = sizeArray(oid);
+  i = 0;
+  VarBind_t* var_bind;
+  VarBindList_t* varlist;
+  InformRequest_PDU_t* informRequestPDU;
+  PDUs_t* pdu;
+  while(i != size) {
+    var_bind = create_varbind_empty(oid[i], var_bind);
+    if(i == 0) {
+      varlist = create_varBindList(var_bind, varlist);
+    }
+    else {
+      varlist = add_to_varBindList(var_bind, varlist);
+    }
+    i++;
+  }
+  informRequestPDU = create_pdu(informRequestPDU, tag, 0, 0, varlist);
+  pdu = create_getRequest_pdu(pdu, informRequestPDU);
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
+}

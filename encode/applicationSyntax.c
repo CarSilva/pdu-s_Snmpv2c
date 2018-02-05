@@ -36,6 +36,32 @@ ApplicationSyntax_t* insert_unsigned_integer_value(Unsigned32_t value, Applicati
   return application;
 }
 
+int removeDots(char* oid, uint8_t* name) {
+  char *oidentifier = strdup(oid);
+  char *string;
+  int id;
+  int i;
+  i = 0;
+  string = strtok(oidentifier,".");
+  while (string != NULL) {
+    id = atoi(string);
+    name[i] = id;
+    i++;
+    string = strtok(NULL, ".");
+  }
+  return i;
+}
+
+OCTET_STRING_t* create_octet_string(OCTET_STRING_t* oct, char *oid_text) {
+  uint8_t* name;
+  int size;
+  name = malloc(1024*sizeof(uint8_t));
+  size = removeDots(oid_text, name);
+  oct->buf = name;
+  oct->size = size;
+  return oct;
+}
+
 ApplicationSyntax_t* create_application(int flag, char* string, ApplicationSyntax_t* application) {
   unsigned long value;
   long valueLong;
@@ -45,8 +71,8 @@ ApplicationSyntax_t* create_application(int flag, char* string, ApplicationSynta
   application = calloc(1, sizeof(ApplicationSyntax_t));
   switch(flag) {
    case 4:
-      str = calloc(1, sizeof(OCTET_STRING_t));
-      oc = OCTET_STRING_fromBuf(str,string,-1);
+      str = malloc(sizeof(OCTET_STRING_t));
+      str = create_octet_string(str, string);
       application = insert_ipAdress(str, application);
       break;
    case 5:

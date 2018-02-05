@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <ObjectSyntax.h>
 #include <PDUs.h>
 #include <primitives.h>
@@ -15,8 +16,9 @@ char** oid;
 long version;
 char** value;
 int flag[100];
+uint8_t buffer_final[1024];
 
-
+/*
 int menu_out(uint8_t buffer_final[], long n) {
   int temp;
   int choice, i;
@@ -144,7 +146,6 @@ int menu_setRequest() {
   community = str;
   printf("\n");
   temp = menu_values();
-  uint8_t buffer_final[1024];
   long n = setRequest(flag,version,community,id,oid,value,buffer_final);
   temp = menu_out(buffer_final, n);
   return 0;
@@ -274,39 +275,81 @@ int menu_principal() {
  }
  while (choice != 3);
 }
+*/
 
-int main() {
-  int temp;
-  temp = menu_principal();
-  /*
-  char* ip;
-  char* porta;
-  char* community;
-  char** oid;
-  long version;
-  char** value;
-  int flag[100];
-  int i = 0;
-  //temp = menu_principal();
+void aloca() {
+  int i;
   value = (char**) malloc(100*sizeof(char *));
   oid = (char**) malloc(100*sizeof(char *));
   for(i = 0; i < 100; i++) {
     value[i] = (char *) malloc(20 * sizeof(char));
     oid[i] = (char *) malloc(20 * sizeof(char));
   }
-  value[0] = "1";
-  value[1] = NULL;
-  flag[0] = 1;
-  oid[0] = "1.2.3.4";
-  oid[1] = NULL;
-  uint8_t *buffer_final;
-  buffer_final = setRequest(flag,2,"public",5,oid,value,buffer_final);
+}
+
+int main() {
+  int temp;
+  //temp = menu_principal();
+  int i, n;
+
+  aloca();
+
+  //testar com diferentes tipos de valores, necessita de o ultimo valor estar a NULL;
+  value[0] = "10"; /*value[1] = "11";*/ value[1] = NULL;
+  flag[0] = 1;            //flag[1] = 1;
+  oid[0] = "1.2.3.4";     /*oid[1] = "5.6.7.8";*/     oid[1] = NULL;
+
+  //testar getRequest
+  //versão, community, tag, oid, buffer_final
+  //n = getRequest(2, "public", 1, oid, buffer_final);
+
+  n = setRequest(flag, 2, "public", 5, oid, value, buffer_final);
+
+  struct sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(8954);
+  addr.sin_addr.s_addr = inet_addr("192.168.1.125");
+  int sock = socket(AF_INET, SOCK_DGRAM, 0);
+  socklen_t udp_socket_size = sizeof(addr);
+  int sent = sendto(sock, buffer_final, sizeof(buffer_final), 0, (struct sockaddr *)&addr,
+                    udp_socket_size);
+  printf("ola\n");
+  //testar setRequest
+
+
+
+  //imprime
+
   i = 0;
-  int n = sizeof(buffer_final);
   printf("Codificação buffer final: \n\n");
   while (i != n) {
   printf("%02x ", buffer_final[i] & 0xff);
     i++;
   }
-  */
+
+
+/*
+Message_t *messaged = 0;
+asn_dec_rval_t rval1 = asn_decode(0, ATS_BER, &asn_DEF_Message,
+                              (void **)&messaged, buffer_final, sizeof(buffer_final)); //tratar erro se der -1
+if(rval1.code ==  RC_FAIL){ //significa que a descodificaçaºo falhou, está a entrar no if nao sei bem porque
+  printf("fail\n");
+}
+printf("Message_SIZE = %d\n",messaged->data.size );
+PDUs_t* pdud = 0;
+asn_dec_rval_t rval2 = asn_decode(0, ATS_BER, &asn_DEF_PDUs,
+                              (void **)&pdud, messaged->data.buf, messaged->data.size); //tratar erro se der -1
+if(rval2.code ==  RC_WMORE){ //significa que a descodificaçaºo falhou, está a entrar no if nao sei bem porque
+  printf("Want More info\n");
+}
+VarBindList_t var_bindingsd = pdud->choice.set_request.variable_bindings;
+printf("List_VarBindings_Size = %d\n", var_bindingsd.list.count);
+VarBind_t* var_bindd = var_bindingsd.list.array[0];
+ObjectName_t* object_named = &(var_bindd->name);
+ObjectSyntax_t* object_syntaxd = &(var_bindd->choice.choice.value);
+/*char *str = (char *) object_named->buf;
+char *final = malloc(1024);
+snprintf(final, 1024, "%s%c", str, '\0');
+printf("%s\n", final);
+*/
 }
