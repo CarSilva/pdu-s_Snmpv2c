@@ -23,10 +23,10 @@ PDUs_t *buffer_to_PDU(uint8_t *buffer_final){
 }
 
 const char *getVersion(Message_t *message){
-	return message->version;
+	return (const char *)message->version;
 }
 
-const char *getComm(Message_t *message){
+OCTET_STRING_t getComm(Message_t *message){
 	return message->community;
 }
 

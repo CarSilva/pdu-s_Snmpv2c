@@ -4,6 +4,7 @@
 #include <PDUs.h>
 
 typedef enum Present {
+	Nothing,
 	Long,
 	String,
 	OID,
