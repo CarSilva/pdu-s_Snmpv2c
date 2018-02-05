@@ -26,3 +26,9 @@ ObjectSyntax_t* create_object(int flag, SimpleSyntax_t* simple, ApplicationSynta
   }
   return object_syntax;
 }
+
+ObjectSyntax_t* create_empty_object(ObjectSyntax_t* object_syntax) {
+  object_syntax = calloc(1, sizeof(ObjectSyntax_t));
+  object_syntax->present = ObjectSyntax_PR_NOTHING;
+  return object_syntax;
+}

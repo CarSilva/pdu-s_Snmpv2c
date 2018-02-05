@@ -8,8 +8,13 @@ ASN_PROGRAM_SRCS ?= \
 	simpleSyntax.c \
 	applicationSyntax.c \
 	objectSyntax.c \
-	setRequestPDU.c\
+	objectName.c \
+	varBind.c\
+	varBindList.c \
+	pdu.c \
+	pdus.c \
 	message.c \
+	primitives.c \
 	encoder.c \
 	pdu_collection.c
 
