@@ -17,9 +17,9 @@ char** value;
 int flag[100];
 
 
-int menu_out(uint8_t* buffer_final) {
+int menu_out(uint8_t buffer_final[], long n) {
   int temp;
-  int choice, n, i;
+  int choice, i;
   printf("\n");
   printf("Escolha para onde deve ser enviado o output:\n\n");
   printf("1. Terminal\n");
@@ -32,7 +32,6 @@ int menu_out(uint8_t* buffer_final) {
     case 1:
       //clear();
       i = 0;
-      n = sizeof(buffer_final);
       printf("Codificação buffer final: \n\n");
       while (i != n) {
       printf("%02x ", buffer_final[i] & 0xff);
@@ -145,9 +144,9 @@ int menu_setRequest() {
   community = str;
   printf("\n");
   temp = menu_values();
-  uint8_t *buffer_final;
-  buffer_final = setRequest(flag,version,community,id,oid,value,buffer_final);
-  temp = menu_out(buffer_final);
+  uint8_t buffer_final[1024];
+  long n = setRequest(flag,version,community,id,oid,value,buffer_final);
+  temp = menu_out(buffer_final, n);
   return 0;
 }
 

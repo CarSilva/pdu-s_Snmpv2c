@@ -18,16 +18,16 @@ int sizeArray(char**);
 
 ObjectSyntax_t* decide_object(int, char*, ObjectSyntax_t*);
 
-uint8_t* encoding(PDUs_t*, long, char*, uint8_t*);
+long encoding(PDUs_t*, long, char*, uint8_t*);
 
-uint8_t* getRequest(long, char*, long, char**, uint8_t*);
+long getRequest(long, char*, long, char**, uint8_t*);
 
-uint8_t* getNextRequest(long, char*, long, char**, uint8_t*);
+long getNextRequest(long, char*, long, char**, uint8_t*);
 
-uint8_t* getBulkRequest(long, char*, long, char**,long, long, uint8_t*);
+long getBulkRequest(long, char*, long, char**,long, long, uint8_t*);
 
-uint8_t* response(int[], long, char*, long, char**, long,long, char**, uint8_t*);
+long response(int[], long, char*, long, char**, long,long, char**, uint8_t*);
 
-uint8_t* setRequest(int[], long, char*, long, char**, char**, uint8_t *);
+long setRequest(int[], long, char*, long, char**, char**, uint8_t *);
 
 #endif

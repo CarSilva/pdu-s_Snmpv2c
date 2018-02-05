@@ -31,26 +31,26 @@ ObjectSyntax_t* decide_object(int flag, char* value, ObjectSyntax_t* object_synt
   return object_syntax;
 }
 
-uint8_t* encoding(PDUs_t* pdu, long version, char* community, uint8_t* buffer_final) {
-  uint8_t* buffer;
+long encoding(PDUs_t* pdu, long version, char* community, uint8_t buffer_final[]) {
+  FILE* fout = stdout;
+  uint8_t buffer[1024];
   ANY_t* data;
   Message_t* message;
-  buffer = calloc(1024, sizeof(uint8_t));
+  xer_fprint(fout, &asn_DEF_PDUs, pdu);
   asn_enc_rval_t ret = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_PDUs, pdu,
-                                            buffer, sizeof(buffer));
+                                            buffer, 1024);
   data = create_data(buffer, ret, data);
   message = create_message(data, version, community, message);
-  buffer_final = calloc(1024, sizeof(uint8_t));
   asn_enc_rval_t ret2 = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_Message, message,
-                                             buffer_final, sizeof(buffer_final));
-  FILE* fout = stdout;
-  xer_fprint(fout, &asn_DEF_Message, message);
-  return buffer_final;
+                                             buffer_final, 1024);
+  //xer_fprint(fout, &asn_DEF_Message, message);
+  return ret2.encoded;
 }
 
 //id = 1
-uint8_t* getRequest(long version, char* community, long tag, char** oid, uint8_t* buffer_final) {
+long getRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
   int size, i;
+  long n;
   size = sizeArray(oid);
   i = 0;
   VarBind_t* var_bind;
@@ -69,16 +69,15 @@ uint8_t* getRequest(long version, char* community, long tag, char** oid, uint8_t
   }
   getRequestPDU = create_pdu(getRequestPDU, tag, 0, 0, varlist);
   pdu = create_getRequest_pdu(pdu, getRequestPDU);
-  buffer_final = encoding(pdu, version, community, buffer_final);
-  return buffer_final;
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
 }
 
 //id = 2
-/*
-Questão: create_varbind_empty ????
-*/
-uint8_t* getNextRequest(long version, char* community, long tag, char** oid, uint8_t* buffer_final) {
+
+long getNextRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
   int size, i;
+  long n;
   size = sizeArray(oid);
   i = 0;
   VarBind_t* var_bind;
@@ -97,14 +96,16 @@ uint8_t* getNextRequest(long version, char* community, long tag, char** oid, uin
   }
   getNextRequestPDU = create_pdu(getNextRequestPDU, tag, 0, 0, varlist);
   pdu = create_getNextRequest_pdu(pdu, getNextRequestPDU);
-  buffer_final = encoding(pdu, version, community, buffer_final);
-  return buffer_final;
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
 }
 
+
 //id = 3
-uint8_t* getBulkRequest(long version, char* community, long tag, char** oid,
-                        long non_repeaters, long	max_repetitions, uint8_t* buffer_final) {
+long getBulkRequest(long version, char* community, long tag, char** oid,
+                        long non_repeaters, long	max_repetitions, uint8_t buffer_final[]) {
   int size, i;
+  long n;
   size = sizeArray(oid);
   i = 0;
   VarBind_t* var_bind;
@@ -123,23 +124,17 @@ uint8_t* getBulkRequest(long version, char* community, long tag, char** oid,
   }
   getBulkRequestPDU = create_bulk_pdu(getBulkRequestPDU, tag, non_repeaters, max_repetitions, varlist);
   pdu = create_getBulkRequest_pdu(pdu, getBulkRequestPDU);
-  buffer_final = encoding(pdu, version, community, buffer_final);
-  return buffer_final;
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
 }
 
-//id = 4
-/*
-If the error-status field of the Response-PDU is non-zero, the value
-fields of the variable bindings in the variable binding list are
-ignored.
 
-If both the error-status field and the error-index field of the
-Response-PDU are non-zero
-Questão: Temos que fazer uma api apropriada para cada caso, ou um response geral capaz de receber todos os valores
-*/
-uint8_t* response(int flag[], long version, char* community, long tag, char**oid, long error_status,
-                  long index_error, char** value, uint8_t* buffer_final) {
+//id = 4
+
+long response(int flag[], long version, char* community, long tag, char**oid, long error_status,
+                  long index_error, char** value, uint8_t buffer_final[]) {
   int size, i;
+  long n;
   size = sizeArray(value);
   i = 0;
   ObjectSyntax_t* object_syntax;
@@ -160,15 +155,15 @@ uint8_t* response(int flag[], long version, char* community, long tag, char**oid
   }
   ResponsePDU = create_pdu(ResponsePDU, tag, error_status, index_error, varlist);
   pdu = create_response_pdu(pdu, ResponsePDU);
-  buffer_final = encoding(pdu, version, community, buffer_final);
-  return buffer_final;
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
 }
 
-
 //id = 5
-uint8_t* setRequest(int flag[], long version, char* community, long tag,
-                    char** oid, char** value, uint8_t *buffer_final) {
+long setRequest(int flag[], long version, char* community, long tag,
+                    char** oid, char** value, uint8_t buffer_final[]) {
   int size, i;
+  long n;
   size = sizeArray(value);
   i = 0;
   ObjectSyntax_t* object_syntax;
@@ -189,8 +184,8 @@ uint8_t* setRequest(int flag[], long version, char* community, long tag,
   }
   setRequestPDU =  create_pdu(setRequestPDU, tag, 0, 0, varlist);
   pdu = create_setRequest_pdu(pdu, setRequestPDU);
-  buffer_final = encoding(pdu, version, community, buffer_final);
-  return buffer_final;
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
 }
 
 /*
