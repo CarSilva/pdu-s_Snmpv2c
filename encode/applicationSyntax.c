@@ -1,6 +1,4 @@
-#include <ApplicationSyntax.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <applicationSyntax.h>
 
 ApplicationSyntax_t* insert_ipAdress(IpAddress_t *value, ApplicationSyntax_t* application) {
   application->present = ApplicationSyntax_PR_ipAddress_value;
@@ -38,7 +36,7 @@ ApplicationSyntax_t* insert_unsigned_integer_value(Unsigned32_t value, Applicati
   return application;
 }
 
-ApplicationSyntax_t* create_application(int flag, const char* string, ApplicationSyntax_t* application) {
+ApplicationSyntax_t* create_application(int flag, char* string, ApplicationSyntax_t* application) {
   unsigned long value;
   long valueLong;
   OCTET_STRING_t *str;

@@ -1,18 +1,24 @@
-#ifndef SR_H_
-#define SR_H_
+#ifndef var_bind_h
+#define var_bind_h
 
-VarBind_t* add_oid_to_varbind(const char* oid, VarBind_t* var_bind);
+#include <stdio.h>
+#include <stdint.h>
+#include <ObjectName.h>
+#include <ObjectSyntax.h>
+#include <VarBind.h>
 
-VarBind_t* create_varbind_value(ObjectSyntax_t* object_syntax, const char* oid, VarBind_t* var_bind);
+VarBind_t* add_oid_to_varbind(char*, VarBind_t*);
 
-VarBind_t* create_varbind_unspecified(const char* oid, VarBind_t* var_bind);
+VarBind_t* create_varbind_value(ObjectSyntax_t*, char*, VarBind_t*);
 
-VarBind_t* create_varbind_noSuchObject(const char* oid, VarBind_t* var_bind);
+VarBind_t* create_varbind_unspecified(char*, VarBind_t*);
 
-VarBind_t* create_varbind_noSuchInstance(const char* oid, VarBind_t* var_bind);
+VarBind_t* create_varbind_noSuchObject(char*, VarBind_t*);
 
-VarBind_t* create_varbind_endOfMibView(const char* oid, VarBind_t* var_bind);
+VarBind_t* create_varbind_noSuchInstance(char*, VarBind_t*);
 
-VarBind_t* create_varbind_empty(const char* oid, VarBind_t* var_bind);
+VarBind_t* create_varbind_endOfMibView(char*, VarBind_t*);
+
+VarBind_t* create_varbind_empty(char*, VarBind_t*);
 
 #endif

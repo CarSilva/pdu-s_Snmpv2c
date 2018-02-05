@@ -1,5 +1,4 @@
-#include <SimpleSyntax.h>
-#include <stdlib.h>
+#include <simpleSyntax.h>
 
 SimpleSyntax_t* insert_value(long value, SimpleSyntax_t* simple) {
   simple->present = SimpleSyntax_PR_integer_value;
@@ -19,7 +18,7 @@ SimpleSyntax_t* insert_oid(OBJECT_IDENTIFIER_t* value, SimpleSyntax_t* simple) {
   return simple;
 }
 
-OBJECT_IDENTIFIER_t* encode_OID(OBJECT_IDENTIFIER_t *oid, const char *oid_text) {
+OBJECT_IDENTIFIER_t* encode_OID(OBJECT_IDENTIFIER_t *oid, char *oid_text) {
   oid = calloc(1, sizeof(OBJECT_IDENTIFIER_t));
   asn_oid_arc_t fixed_arcs[10];
   asn_oid_arc_t *arcs = fixed_arcs;
@@ -43,7 +42,7 @@ OBJECT_IDENTIFIER_t* encode_OID(OBJECT_IDENTIFIER_t *oid, const char *oid_text) 
   return oid;
 }
 
-SimpleSyntax_t* create_simple(int flag, const char* string, SimpleSyntax_t* simple) {
+SimpleSyntax_t* create_simple(int flag, char* string, SimpleSyntax_t* simple) {
   long value;
   OCTET_STRING_t *str;
   OBJECT_IDENTIFIER_t *oid;

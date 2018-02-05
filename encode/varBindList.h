@@ -1,6 +1,13 @@
-#ifndef SR_H_
-#define SR_H_
+#ifndef var_bind_list_h
+#define var_bind_list_h
 
-VarBindList_t* create_varBindList(VarBind_t* var_bind, VarBindList_t* varlist)
+#include <stdio.h>
+#include <stdint.h>
+#include <VarBind.h>
+#include <VarBindList.h>
+
+VarBindList_t* create_varBindList(VarBind_t*, VarBindList_t*);
+
+VarBindList_t* add_to_varBindList(VarBind_t*, VarBindList_t*);
 
 #endif
