@@ -4,19 +4,65 @@
 #include <PDUs.h>
 #include <primitives.h>
 
-const char* id;
-const char* ip;
-const char* porta;
-const char* community;
-const char* oid;
-const char* version;
-const char* value;
-const char* flag;
+
+#define clear() printf("\033[H\033[J")
+
+long id;
+char* ip;
+char* porta;
+char* community;
+char** oid;
+long version;
+char** value;
+int flag[100];
+
+
+int menu_out(uint8_t* buffer_final) {
+  int temp;
+  int choice, n, i;
+  printf("\n");
+  printf("Escolha para onde deve ser enviado o output:\n\n");
+  printf("1. Terminal\n");
+  printf("2. Ficheiro\n");
+  printf("3. SocketUDP\n");
+  printf("4. Sair\n");
+  printf("\n");
+  scanf("%d",&choice);
+  switch (choice) {
+    case 1:
+      //clear();
+      i = 0;
+      n = sizeof(buffer_final);
+      printf("Codificação buffer final: \n\n");
+      while (i != n) {
+      printf("%02x ", buffer_final[i] & 0xff);
+        i++;
+      }
+      printf("\n");
+      printf("\n");
+      printf("\n");
+      break;
+    case 2:
+
+      break;
+    case 3:
+
+      break;
+    case 4:
+      printf("Programa terminado\n");
+      break;
+    default:
+      printf("Opção errada\n");
+      break;
+   }
+}
 
 int menu_values() {
-  char str[80];
   int temp;
   int choice;
+  int i;
+  i = 0;
+  do {
     printf("\n");
     printf("Escolha a primitiva que deseja testar:\n\n");
     printf("1. Long\n");
@@ -33,39 +79,53 @@ int menu_values() {
     scanf("%d",&choice);
     switch (choice) {
       case 1:
-        flag = "1";
+        flag[i] = 1;
         break;
       case 2:
-        flag = "2";
+        flag[i] = 2;
         break;
       case 3:
-        flag = "3";
+        flag[i] = 3;
         break;
       case 4:
-        flag = "4";
+        flag[i] = 4;
         break;
       case 5:
-        flag = "5";
+        flag[i] = 5;
         break;
       case 6:
-        flag = "6";
+        flag[i] = 6;
         break;
       case 7:
-        flag = "7";
+        flag[i] = 7;
         break;
       case 8:
-        flag = "8";
+        flag[i] = 8;
         break;
       case 9:
-        flag = "9";
+        flag[i] = 9;
         break;
       case 10:
+        value[i] = NULL;
         printf("Programa terminado\n");
         break;
       default:
         printf("Opção errada\n");
         break;
-   }
+      }
+      if(choice != 10) {
+        char str[80];
+        printf("OID: ");
+        fgets(str, 80, stdin);
+        fgets(str, 80, stdin);
+        oid[i] = str;
+        printf("Valor: ");
+        fgets(str, 80, stdin);
+        value[i] = str;
+        i++;
+      }
+    }
+ while(choice != 10);
 }
 
 int menu_setRequest() {
@@ -84,18 +144,10 @@ int menu_setRequest() {
   fgets(str, 80, stdin);
   community = str;
   printf("\n");
-  printf("OID: ");
-  fgets(str, 80, stdin);
-  oid = str;
   temp = menu_values();
   uint8_t *buffer_final;
-  buffer_final = setRequest(flag,version,community,id,oid,"123", buffer_final);
-  printf("Tamanho do buffer final: %d\n", sizeof(buffer_final));
-  printf("Codificação buffer final: \n%02x %02x %02x %02x %02x %02x %02x %02x\n",
-         buffer_final[0] & 0xff, buffer_final[1] & 0xff, buffer_final[2] & 0xff,
-         buffer_final[3] & 0xff, buffer_final[4] & 0xff, buffer_final[5] & 0xff,
-         buffer_final[6] & 0xff, buffer_final[7]);
-  printf("\n");
+  buffer_final = setRequest(flag,version,community,id,oid,value,buffer_final);
+  temp = menu_out(buffer_final);
   return 0;
 }
 
@@ -117,35 +169,35 @@ int menu_terminal_v2() {
   scanf("%d",&choice);
   switch (choice) {
     case 1:
-      id = "1";
+      id = 1;
       //temp = menu_getRequest();
       break;
     case 2:
-      id = "2";
+      id = 2;
       //temp = menu_getNextRequest();
       break;
     case 3:
-      id = "3";
+      id = 3;
       //temp = menu_getBulkRequest();
       break;
     case 4:
-      id = "4";
+      id = 4;
       //temp = menu_Response();
       break;
     case 5:
-      id = "5";
+      id = 5;
       temp = menu_setRequest();
       break;
     case 6:
-      id = "6";
+      id = 6;
       //temp = menu_informRequest();
       break;
     case 7:
-      id = "7";
+      id = 7;
       //temp = menu_snmpv2();
       break;
     case 8:
-      id = "8";
+      id = 8;
       //temp = menu_report();
       break;
     case 9:
@@ -156,8 +208,6 @@ int menu_terminal_v2() {
         break;
    }
 }
-
-
 
 int menu_terminal() {
   int temp;
@@ -171,15 +221,15 @@ int menu_terminal() {
   scanf("%d",&choice);
   switch (choice) {
     case 1:
-      version = "1";
+      version = 1;
       //temp = menu_terminal_v1();
       break;
     case 2:
-      version = "2";
+      version = 2;
       temp = menu_terminal_v2();
       break;
     case 3:
-      version = "3";
+      version = 3;
       //temp = menu_terminal_v3();
       break;
     case 4:
@@ -194,6 +244,13 @@ int menu_terminal() {
 int menu_principal() {
   int temp;
   int choice;
+  int i;
+  value = (char**) malloc(100*sizeof(char *));
+  oid = (char**) malloc(100*sizeof(char *));
+  for(i = 0; i < 100; i++) {
+    value[i] = (char *) malloc(20 * sizeof(char));
+    oid[i] = (char *) malloc(20 * sizeof(char));
+  }
   do {
     printf("Menu\n\n");
     printf("1. Ler dados do terminal\n");
@@ -219,8 +276,38 @@ int menu_principal() {
  while (choice != 3);
 }
 
-
 int main() {
   int temp;
   temp = menu_principal();
+  /*
+  char* ip;
+  char* porta;
+  char* community;
+  char** oid;
+  long version;
+  char** value;
+  int flag[100];
+  int i = 0;
+  //temp = menu_principal();
+  value = (char**) malloc(100*sizeof(char *));
+  oid = (char**) malloc(100*sizeof(char *));
+  for(i = 0; i < 100; i++) {
+    value[i] = (char *) malloc(20 * sizeof(char));
+    oid[i] = (char *) malloc(20 * sizeof(char));
+  }
+  value[0] = "1";
+  value[1] = NULL;
+  flag[0] = 1;
+  oid[0] = "1.2.3.4";
+  oid[1] = NULL;
+  uint8_t *buffer_final;
+  buffer_final = setRequest(flag,2,"public",5,oid,value,buffer_final);
+  i = 0;
+  int n = sizeof(buffer_final);
+  printf("Codificação buffer final: \n\n");
+  while (i != n) {
+  printf("%02x ", buffer_final[i] & 0xff);
+    i++;
+  }
+  */
 }

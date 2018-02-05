@@ -9,7 +9,7 @@ ASN_PROGRAM_SRCS ?= \
 	applicationSyntax.c \
 	objectSyntax.c \
 	objectName.c \
-	varBind.c\
+	varBind.c \
 	varBindList.c \
 	pdu.c \
 	pdus.c \

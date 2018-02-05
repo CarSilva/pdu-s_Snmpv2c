@@ -1,8 +1,6 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <ObjectName.h>
+#include <objectName.h>
 
-uint8_t* fill_oid(const char* oid, uint8_t* name) {
+uint8_t* fill_oid(char* oid, uint8_t* name) {
   char *oidentifier = strdup(oid);
   char *string;
   int id;
@@ -19,7 +17,7 @@ uint8_t* fill_oid(const char* oid, uint8_t* name) {
   return name;
 }
 
-ObjectName_t* create_object_name(ObjectName_t* object_name, const char* oid) {
+ObjectName_t* create_object_name(ObjectName_t* object_name, char* oid) {
   uint8_t* name;
   name = fill_oid(oid, name);
   object_name = calloc(1, sizeof(ObjectName_t));

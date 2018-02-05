@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <PDUs.h>
-#include <PDU.h>
-#include <BulkPDU.h>
+#include <pdus.h>
 
 PDUs_t* create_getRequest_pdu(PDUs_t* pdus, GetRequest_PDU_t* pdu) {
   pdus = calloc(1, sizeof(PDUs_t));

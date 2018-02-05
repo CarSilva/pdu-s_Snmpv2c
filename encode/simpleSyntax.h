@@ -1,14 +1,17 @@
-#ifndef SR_H_
-#define SR_H_
+#ifndef simple_syntax_h
+#define simple_syntax_h
 
-SimpleSyntax_t* insert_value(long value, SimpleSyntax_t* simple);
+#include <SimpleSyntax.h>
+#include <stdlib.h>
 
-SimpleSyntax_t* insert_string(OCTET_STRING_t value, SimpleSyntax_t* simple);
+SimpleSyntax_t* insert_value(long, SimpleSyntax_t*);
 
-SimpleSyntax_t* insert_oid(OBJECT_IDENTIFIER_t value, SimpleSyntax_t* simple);
+SimpleSyntax_t* insert_string(OCTET_STRING_t*, SimpleSyntax_t*);
 
-OBJECT_IDENTIFIER_t* encode_OID(OBJECT_IDENTIFIER_t *oid, const char *oid_text);
+SimpleSyntax_t* insert_oid(OBJECT_IDENTIFIER_t*, SimpleSyntax_t*);
 
-SimpleSyntax_t* create_simple(int flag, const char* string, SimpleSyntax_t* simple);
+OBJECT_IDENTIFIER_t* encode_OID(OBJECT_IDENTIFIER_t*, char*);
+
+SimpleSyntax_t* create_simple(int, char*, SimpleSyntax_t*);
 
 #endif

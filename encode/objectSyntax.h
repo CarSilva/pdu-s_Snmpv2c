@@ -1,10 +1,12 @@
-#ifndef SR_H_
-#define SR_H_
+#ifndef object_syntax_h
+#define object_syntax_h
 
-ObjectSyntax_t* object_create_simple(SimpleSyntax_t* simple, ObjectSyntax_t* object_syntax);
+#include <ObjectSyntax.h>
 
-ObjectSyntax_t* object_create_application(ApplicationSyntax_t* application_wide, ObjectSyntax_t* object_syntax);
+ObjectSyntax_t* create_simple_object(SimpleSyntax_t*, ObjectSyntax_t*);
 
-ObjectSyntax_t* create_object(int flag, SimpleSyntax_t* simple, ApplicationSyntax_t* application_wide, ObjectSyntax_t* object_syntax);
+ObjectSyntax_t* create_application_object(ApplicationSyntax_t*, ObjectSyntax_t*);
+
+ObjectSyntax_t* create_empty_object(ObjectSyntax_t*);
 
 #endif

@@ -1,8 +1,12 @@
-#ifndef SR_H_
-#define SR_H_
+#ifndef object_name_h
+#define object_name_h
 
-uint8_t* fill_oid(const char* oid, uint8_t* name);
+#include <stdio.h>
+#include <stdint.h>
+#include <ObjectName.h>
 
-ObjectName_t* create_object_name(ObjectName_t* object_name, const char* oid);
+uint8_t* fill_oid(char*, uint8_t*);
+
+ObjectName_t* create_object_name(ObjectName_t*, char*);
 
 #endif

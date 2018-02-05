@@ -1,8 +1,9 @@
-#ifndef SR_H_
-#define SR_H_
+#define message_h
 
-ANY_t* create_data(uint8_t *buffer, asn_enc_rval_t ret, ANY_t *data);
+#include <PDUs.h>
+#include <ANY.h>
+#include <Message.h>
 
-Message_t* create_message(ANY_t* data, const char* version, const char* community, Message_t* message);
+ANY_t* create_data(uint8_t*, asn_enc_rval_t, ANY_t*);
 
-#endif
+Message_t* create_message(ANY_t*, long, char*, Message_t*);
