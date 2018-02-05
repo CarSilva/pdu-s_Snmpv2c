@@ -13,7 +13,11 @@ typedef enum Present {
 	Time,
 	Arbitraty,
 	Big_Counter,
-	Unsign32
+	Unsign32,
+	UnSpecified,
+	NoSuchObject,
+	NoSuchInstance,
+	EndOfMibView
 } Present;
 
 typedef struct pdu_field {
@@ -29,10 +33,24 @@ typedef struct pdu_field {
 		Opaque_t opaque;
 		Counter64_t counter64;
 		Unsigned32_t unsign32;
+		NULL_t	 unSpecified;
+		NULL_t	 noSuchObject;
+		NULL_t	 noSuchInstance;
+		NULL_t	 endOfMibView;
 	} fields;
 }Pdu_Field;
 
+typedef struct decoded{
+	int nFields;
+	long request_id;
+	long error_status;
+	long error_index;
+	long non_repeaters;
+	long max_repetitions;
+	Pdu_Field *decoded;
+}Decoded;
 
-void parsePdu(PDUs_t *pdu, Pdu_Field *field);
+
+void parsePdu(PDUs_t *pdu, Decoded *decoded);
 
 #endif

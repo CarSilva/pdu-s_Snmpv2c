@@ -2,9 +2,6 @@
 #include <PDUs.h>
 #include <parsePDU.h>
 
-
-//ver a cena de ter mais que um oid ?!
-
 void parseSimple(SimpleSyntax_t *simple, Pdu_Field *field){
 	switch(simple->present){
 		case SimpleSyntax_PR_integer_value:
@@ -56,71 +53,122 @@ void parseApplicationSyntax(ApplicationSyntax_t *appSyn, Pdu_Field *field){
 	}
 }
 
-Pdu_Field getObjectSyntax(VarBind_t *var_bind, Pdu_Field *field){
-	ObjectSyntax_t* object_syntax = &(var_bind->choice.choice.value);
+Pdu_Field exploreVarBind(VarBind_t *var_bind, Pdu_Field *field){
+	ObjectSyntax_t* object_syntax;
 	SimpleSyntax_t *simple;
 	ApplicationSyntax_t *appSyn;
-	switch(object_syntax->present){
-		case ObjectSyntax_PR_simple:
-			simple = &(object_syntax->choice.simple);
-			parseSimple(simple, field);
+	switch(var_bind->choice.present){
+		case choice_PR_NOTHING:
+			field->present = Nothing;
 			break;
-		case ObjectSyntax_PR_application_wide:
-			appSyn = &(object_syntax->choice.application_wide);
-			parseApplicationSyntax(appSyn, field);
+		case choice_PR_value:
+			object_syntax = &(var_bind->choice.choice.value);
+			switch(object_syntax->present){
+				case ObjectSyntax_PR_simple:
+					simple = &(object_syntax->choice.simple);
+					parseSimple(simple, field);
+					break;
+				case ObjectSyntax_PR_application_wide:
+					appSyn = &(object_syntax->choice.application_wide);
+					parseApplicationSyntax(appSyn, field);
+					break;
+			}
+		case choice_PR_unSpecified:
+			field->present = UnSpecified;
+			field->fields.unSpecified = var_bind->choice.choice.unSpecified;
 			break;
+
+		case choice_PR_noSuchObject:
+			field->present = NoSuchObject;
+			field->fields.noSuchObject = var_bind->choice.choice.noSuchObject;
+			break;
+
+		case choice_PR_noSuchInstance:
+			field->present = NoSuchInstance;
+			field->fields.noSuchInstance = var_bind->choice.choice.noSuchInstance;
+			break;
+
+		case choice_PR_endOfMibView:
+			field->present = EndOfMibView;
+			field->fields.endOfMibView = var_bind->choice.choice.endOfMibView;
 	}
 }
 
-
-VarBind_t *getVarBind(PDUs_t *pdu){
+VarBindList_t getVarBindings(PDUs_t *pdu, Decoded *decoded){
 	VarBindList_t var_bindings;
 	VarBind_t* var_bind;
 	switch(pdu->present){
 		case PDUs_PR_get_request:
 			var_bindings = pdu->choice.get_request.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.get_request.request_id;
+			decoded->error_status = pdu->choice.get_request.error_status;
+			decoded->error_index = pdu->choice.get_request.error_index;
 			break;
 		case PDUs_PR_get_next_request:
 			var_bindings = pdu->choice.get_next_request.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.get_next_request.request_id;
+			decoded->error_status = pdu->choice.get_next_request.error_status;
+			decoded->error_index = pdu->choice.get_next_request.error_index;
 			break;
 		case PDUs_PR_get_bulk_request:
 			var_bindings = pdu->choice.get_bulk_request.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.get_bulk_request.request_id;
+			decoded->non_repeaters = pdu->choice.get_bulk_request.non_repeaters;
+			decoded->max_repetitions = pdu->choice.get_bulk_request.max_repetitions;
 			break;
 		case PDUs_PR_response:
 			var_bindings = pdu->choice.response.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.response.request_id;
+			decoded->error_status = pdu->choice.response.error_status;
+			decoded->error_index = pdu->choice.response.error_index;
 			break;
 		case PDUs_PR_set_request:
 			var_bindings = pdu->choice.set_request.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.set_request.request_id;
+			decoded->error_status = pdu->choice.set_request.error_status;
+			decoded->error_index = pdu->choice.set_request.error_index;
 			break;
 		case PDUs_PR_inform_request:
 			var_bindings = pdu->choice.inform_request.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.inform_request.request_id;
+			decoded->error_status = pdu->choice.inform_request.error_status;
+			decoded->error_index = pdu->choice.inform_request.error_index;
 			break;	
 		case PDUs_PR_snmpV2_trap:
 			var_bindings = pdu->choice.snmpV2_trap.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.snmpV2_trap.request_id;
+			decoded->error_status = pdu->choice.snmpV2_trap.error_status;
+			decoded->error_index = pdu->choice.snmpV2_trap.error_index;
 			break;	
 		case PDUs_PR_report:
 			var_bindings = pdu->choice.report.variable_bindings;
-			var_bind = var_bindings.list.array[0];
+			decoded->request_id = pdu->choice.report.request_id;
+			decoded->error_status = pdu->choice.report.error_status;
+			decoded->error_index = pdu->choice.report.error_index;
 			break;
 	}	
 
-    return var_bind;
+    return var_bindings;
+}
+
+VarBind_t *getVarBind(VarBindList_t var_bindings, int index){
+	return var_bindings.list.array[index];
 }
 
 void getOid(VarBind_t *var_bind, Pdu_Field *field){
 	field->oid = var_bind->name.buf;
 }
 
-void parsePdu(PDUs_t *pdu, Pdu_Field *field){
-	VarBind_t *var_bind = getVarBind(pdu);
-	getOid(var_bind, field);
-	getObjectSyntax(var_bind, field);
+void parsePdu(PDUs_t *pdu, Decoded *decoded){
+	int i;
+	Pdu_Field *fields = malloc(1024 * sizeof(struct pdu_field));
+	VarBindList_t var_bindings = getVarBindings(pdu, decoded);
+	for(i = 0; i < var_bindings.list.count; i++){
+		VarBind_t *var_bind = getVarBind(var_bindings, i);
+		getOid(var_bind, &fields[i]);
+		exploreVarBind(var_bind, &fields[i]);
+	}
+	decoded->nFields = i-1;
+	decoded->decoded = fields;
 }
 
