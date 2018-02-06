@@ -6,13 +6,14 @@
 
 typedef struct pdu_info{
 	PDUs_t *pdu;
-	char *version;
+	long version;
 	char *comm;	
+	int error; // -1  == Fail || 0 == Want More || 1 == Sucess
 }Pdu_Info;
 
-Pdu_Info *buffer_to_PDU(uint8_t *buffer_final);
+void buffer_to_PDU(uint8_t *buffer_final, Pdu_Info *info);
 
-char *getVersion(Message_t *message);
+long getVersion(Message_t *message);
 char *getComm(Message_t *message);
 
 

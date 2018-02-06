@@ -3,41 +3,48 @@
 #include <getPDU.h>
 
 
-Pdu_Info *buffer_to_PDU(uint8_t *buffer_final){
+void buffer_to_PDU(uint8_t *buffer_final, Pdu_Info *info){
 	Message_t *message = calloc(1, sizeof(Message_t));
 	asn_dec_rval_t rval1 = asn_decode(0, ATS_BER, &asn_DEF_Message,
                                     (void **)&message, buffer_final, 1024);
 																		printf("%d\n", message->data.size);
 	switch(rval1.code){
 		case RC_FAIL:
+			info->error = -1;
+			return;
 		case RC_WMORE:
-			return NULL;
+			info->error = 0;
+			return;
+		case RC_OK:
+			info->error = 1;
+			break;
 	}
     PDUs_t* pdu = calloc(1, sizeof(PDUs_t));
     asn_dec_rval_t rval2 = asn_decode(0, ATS_BER, &asn_DEF_PDUs,
                                     (void **)&pdu, message->data.buf, message->data.size);
     switch(rval2.code){
 		case RC_FAIL:
+			info->error = -1;
+			return;
 		case RC_WMORE:
-			return NULL;
+			info->error = 0;
+			return;
+		case RC_OK:
+			info->error = 1;
+			break;
 	}
-	Pdu_Info *info = malloc(sizeof(struct pdu_info));
 	info->pdu = pdu;
-	FILE* fout = stdout;
-	xer_fprint(fout, &asn_DEF_Message, message);
-	//info->version = getVersion(message);
-	//info->comm = getComm(message);
-    return info;
+	//FILE* fout = stdout;
+	//xer_fprint(fout, &asn_DEF_Message, message);
+	info->version = getVersion(message);
+	info->comm = getComm(message);
 }
 
-char *getVersion(Message_t *message){
-	return (char *)message->version;
+long getVersion(Message_t *message){
+	return message->version;
 }
 
 char * getComm(Message_t *message){
 	char *str = (char *) message->community.buf;
-	char *final = malloc(1024);
-
-	snprintf(final, 1024, "%s%c", str, '\0');
-	return final;
+	return str;
 }

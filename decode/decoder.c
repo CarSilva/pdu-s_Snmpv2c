@@ -10,22 +10,31 @@
 
 
 void decode(uint8_t *buffer){
-    int i;
+    int i,j;
 
-    Pdu_Info *info = buffer_to_PDU(buffer);
-    if(info == NULL) {
-        printf("Error. Cannot decode.\n");
+    Pdu_Info *info = malloc(sizeof(struct pdu_info));
+    buffer_to_PDU(buffer, info);
+    if(info->error == -1) {
+        printf("Error. Cannot decode. FAILED\n");
+        return;
+    }else if(info->error == 0){
+        printf("Error. Cannot decode. Want More\n");
         return;
     }
     Decoded *decoded = malloc(sizeof(struct pdu_field));
     parsePdu(info->pdu, decoded);
-    printf("Version : %s  ", info->version);
-    printf("Community String %s", info->comm);
+    printf("Version : %ld  ", info->version);
+    printf("Community String %s  ", info->comm);
     printf("Field number :%d\n", decoded->nFields);
+    //return;
     //falta imprimir requestid, erros,...
     Pdu_Field *fields = decoded->decoded;
     for(i = 0; i < decoded->nFields; i++){
-        printf("OID -> %s\n",fields->oid);
+        printf("OID : ");
+        for(j = 0; j <fields->oid->size; j++ ){
+            printf("%x.",  fields->oid->buf[j]);
+        }
+        printf("\n");
          switch(fields->present){
             case Nothing:
                 printf("Nothing\n");
@@ -34,13 +43,13 @@ void decode(uint8_t *buffer){
                 printf("Value = %ld\n",fields->fields.value);
                 break;
             case String:
-                printf("String = %s\n",fields->fields.string);
+                printf("String = %s\n",(char *)fields->fields.string.buf);
                 break;
             case OID:
-                printf("OID = %s\n", fields->fields.oid);
+                printf("OID = %s\n", (char *)fields->fields.oid.buf);
                 break;
             case IpAddress:
-                printf("IpAddress = %s\n",fields->fields.ip);
+                printf("IpAddress = %s\n", (char *)fields->fields.ip.buf);
                 break;
             case Counter:
                 printf("SmallCounter = %ld\n", fields->fields.counter32);
@@ -49,7 +58,7 @@ void decode(uint8_t *buffer){
                 printf("TimeTicks %ld\n",fields->fields.time);
                 break;
             case Arbitraty:
-                printf("Arbitraty = %s\n",fields->fields.opaque);
+                printf("Arbitraty = %s\n",(char *) fields->fields.opaque.buf);
                 break;
             case Big_Counter:
                 printf("Big_Counter = %d\n",fields->fields.counter64);
@@ -86,9 +95,7 @@ int main(int argc, char const *argv[]) {
     while(1){
         int recv = recvfrom(sock, buffer, 1024, 0,
                 (struct sockaddr *)&addr,&udp_socket_size);
-        printf("%d\n", recv);
         decode(buffer);
-        printf("ola2\n");
     }
 
 }

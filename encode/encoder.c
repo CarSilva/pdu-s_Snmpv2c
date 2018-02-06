@@ -298,8 +298,8 @@ int main() {
   aloca();
 
   //testar com diferentes tipos de valores, necessita de o ultimo valor estar a NULL;
-  value[0] = "10"; /*value[1] = "11";*/ value[1] = NULL;
-  flag[0] = 1;            //flag[1] = 1;
+  value[0] = "puat"; /*value[1] = "11";*/ value[1] = NULL;
+  flag[0] = 2;            //flag[1] = 1;
   oid[0] = "41.2.3.4";     /*oid[1] = "5.6.7.8";*/     oid[1] = NULL;
 
   //testar getRequest

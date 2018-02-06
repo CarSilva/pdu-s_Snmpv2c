@@ -73,6 +73,7 @@ Pdu_Field exploreVarBind(VarBind_t *var_bind, Pdu_Field *field){
 					parseApplicationSyntax(appSyn, field);
 					break;
 			}
+			break;
 		case choice_PR_unSpecified:
 			field->present = UnSpecified;
 			field->fields.unSpecified = var_bind->choice.choice.unSpecified;
@@ -156,7 +157,7 @@ VarBind_t *getVarBind(VarBindList_t var_bindings, int index){
 }
 
 void getOid(VarBind_t *var_bind, Pdu_Field *field){
-	field->oid = var_bind->name.buf;
+	field->oid = &var_bind->name;
 }
 
 void parsePdu(PDUs_t *pdu, Decoded *decoded){
@@ -168,7 +169,7 @@ void parsePdu(PDUs_t *pdu, Decoded *decoded){
 		getOid(var_bind, &fields[i]);
 		exploreVarBind(var_bind, &fields[i]);
 	}
-	decoded->nFields = i-1;
+	decoded->nFields = i;
 	decoded->decoded = fields;
 }
 

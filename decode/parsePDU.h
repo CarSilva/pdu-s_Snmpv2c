@@ -21,7 +21,7 @@ typedef enum Present {
 } Present;
 
 typedef struct pdu_field {
-	uint8_t *oid;
+	ObjectName_t *oid;
 	Present present;
 	union Fields {
 		long value;
