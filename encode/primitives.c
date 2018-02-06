@@ -212,6 +212,7 @@ long setRequest(int flag[], long version, char* community, long tag,
   return n;
 }
 
+
 //id = 6
 long InformRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
   int size, i;
@@ -234,6 +235,33 @@ long InformRequest(long version, char* community, long tag, char** oid, uint8_t 
   }
   informRequestPDU = create_pdu(informRequestPDU, tag, 0, 0, varlist);
   pdu = create_getRequest_pdu(pdu, informRequestPDU);
+  n = encoding(pdu, version, community, buffer_final);
+  return n;
+}
+
+//id = 7
+
+long trap(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
+  int size, i;
+  long n;
+  size = sizeArray(oid);
+  i = 0;
+  VarBind_t* var_bind;
+  VarBindList_t* varlist;
+  SNMPv2_Trap_PDU_t* snmpPDU;
+  PDUs_t* pdu;
+  while(i != size) {
+    var_bind = create_varbind_empty(oid[i], var_bind);
+    if(i == 0) {
+      varlist = create_varBindList(var_bind, varlist);
+    }
+    else {
+      varlist = add_to_varBindList(var_bind, varlist);
+    }
+    i++;
+  }
+  snmpPDU = create_pdu(snmpPDU, tag, 0, 0, varlist);
+  pdu = create_getRequest_pdu(pdu, snmpPDU);
   n = encoding(pdu, version, community, buffer_final);
   return n;
 }

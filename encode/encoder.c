@@ -4,6 +4,9 @@
 #include <ObjectSyntax.h>
 #include <PDUs.h>
 #include <primitives.h>
+#include<arpa/inet.h>
+#include<sys/socket.h>
+#include<linux/net.h>
 
 
 #define clear() printf("\033[H\033[J")
@@ -288,7 +291,7 @@ void aloca() {
 }
 
 int main() {
-  int temp;
+  //int temp;
   //temp = menu_principal();
   int i, n;
 
@@ -297,7 +300,7 @@ int main() {
   //testar com diferentes tipos de valores, necessita de o ultimo valor estar a NULL;
   value[0] = "10"; /*value[1] = "11";*/ value[1] = NULL;
   flag[0] = 1;            //flag[1] = 1;
-  oid[0] = "1.2.3.4";     /*oid[1] = "5.6.7.8";*/     oid[1] = NULL;
+  oid[0] = "41.2.3.4";     /*oid[1] = "5.6.7.8";*/     oid[1] = NULL;
 
   //testar getRequest
   //versão, community, tag, oid, buffer_final
@@ -305,27 +308,31 @@ int main() {
 
   n = setRequest(flag, 2, "public", 5, oid, value, buffer_final);
 
+
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_port = htons(8954);
-  addr.sin_addr.s_addr = inet_addr("192.168.1.125");
+  addr.sin_addr.s_addr = inet_addr("127.0.0.1");
   int sock = socket(AF_INET, SOCK_DGRAM, 0);
   socklen_t udp_socket_size = sizeof(addr);
-  int sent = sendto(sock, buffer_final, sizeof(buffer_final), 0, (struct sockaddr *)&addr,
+  int sent = sendto(sock, buffer_final, n, 0, (struct sockaddr *)&addr,
                     udp_socket_size);
-  printf("ola\n");
+
+
+  printf("%d\n", sent);
   //testar setRequest
 
 
 
   //imprime
-
+  /*
   i = 0;
   printf("Codificação buffer final: \n\n");
   while (i != n) {
   printf("%02x ", buffer_final[i] & 0xff);
     i++;
   }
+  */
 
 
 /*
@@ -347,6 +354,13 @@ printf("List_VarBindings_Size = %d\n", var_bindingsd.list.count);
 VarBind_t* var_bindd = var_bindingsd.list.array[0];
 ObjectName_t* object_named = &(var_bindd->name);
 ObjectSyntax_t* object_syntaxd = &(var_bindd->choice.choice.value);
+int j;
+char temp[1024];
+for(j = 0; j < object_named->size; j++){
+                    temp[j] = object_named->buf[j];
+}
+temp[j] = '\0';
+printf("String = %s\n",temp);
 /*char *str = (char *) object_named->buf;
 char *final = malloc(1024);
 snprintf(final, 1024, "%s%c", str, '\0');

@@ -5,9 +5,9 @@
 
 Pdu_Info *buffer_to_PDU(uint8_t *buffer_final){
 	Message_t *message = calloc(1, sizeof(Message_t));
-	printf("%d\n", message->data.size);
 	asn_dec_rval_t rval1 = asn_decode(0, ATS_BER, &asn_DEF_Message,
-                                    (void **)&message, buffer_final, sizeof(buffer_final));
+                                    (void **)&message, buffer_final, 1024);
+																		printf("%d\n", message->data.size);
 	switch(rval1.code){
 		case RC_FAIL:
 		case RC_WMORE:
@@ -23,8 +23,10 @@ Pdu_Info *buffer_to_PDU(uint8_t *buffer_final){
 	}
 	Pdu_Info *info = malloc(sizeof(struct pdu_info));
 	info->pdu = pdu;
-	info->version = getVersion(message);
-	info->comm = getComm(message);
+	FILE* fout = stdout;
+	xer_fprint(fout, &asn_DEF_Message, message);
+	//info->version = getVersion(message);
+	//info->comm = getComm(message);
     return info;
 }
 
@@ -39,5 +41,3 @@ char * getComm(Message_t *message){
 	snprintf(final, 1024, "%s%c", str, '\0');
 	return final;
 }
-
-

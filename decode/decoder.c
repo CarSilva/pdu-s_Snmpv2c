@@ -1,9 +1,13 @@
-#include <stdlib.h>     
+#include <stdlib.h>
 #include <string.h>
 #include <VarBindList.h>
 #include <PDUs.h>
 #include <getPDU.h>
 #include <parsePDU.h>
+#include<arpa/inet.h>
+#include<sys/socket.h>
+#include<linux/net.h>
+
 
 void decode(uint8_t *buffer){
     int i;
@@ -61,7 +65,7 @@ void decode(uint8_t *buffer){
                 break;
             case NoSuchInstance:
                 printf("No Such Instance %d\n", fields->fields.noSuchInstance);
-                break;         
+                break;
             case EndOfMibView:
                 printf("End of Mib View ... %d\n", fields->fields.endOfMibView);
                 break;
@@ -80,9 +84,9 @@ int main(int argc, char const *argv[]) {
     bind(sock, (struct sockaddr *)&addr, udp_socket_size);
     uint8_t *buffer = malloc(1024*sizeof(uint8_t));
     while(1){
-        int recv = recvfrom(sock, buffer, sizeof(buffer), 0,
+        int recv = recvfrom(sock, buffer, 1024, 0,
                 (struct sockaddr *)&addr,&udp_socket_size);
-        printf("ola\n");
+        printf("%d\n", recv);
         decode(buffer);
         printf("ola2\n");
     }
