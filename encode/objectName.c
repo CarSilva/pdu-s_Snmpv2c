@@ -5,7 +5,8 @@ int fill_oid(char* oid, uint8_t* name) {
   char *string;
   int id;
   int i;
-  i = 0;
+  name[0] = 29;
+  i = 1;
   string = strtok(oidentifier,".");
   while (string != NULL) {
     id = atoi(string);
