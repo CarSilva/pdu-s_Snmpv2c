@@ -47,6 +47,7 @@ VarBind_t* create_varbind_endOfMibView(char* oid, VarBind_t* var_bind) {
 
 VarBind_t* create_varbind_empty(char* oid, VarBind_t* var_bind) {
   var_bind = add_oid_to_varbind(oid, var_bind);
-  var_bind->choice.present = choice_PR_NOTHING;
+  var_bind->choice.present = choice_PR_unSpecified;
+  var_bind->choice.choice.unSpecified = 2;
   return var_bind;
 }

@@ -197,6 +197,7 @@ long setRequest(int flag[], long version, char* community, long tag,
   PDUs_t* pdu;
   while(i != size) {
     object_syntax = decide_object(flag[i], value[i], object_syntax);
+    printf("Dentro %s\n",oid[i] );
     var_bind = create_varbind_value(object_syntax, oid[i], var_bind);
     if(i == 0) {
       varlist = create_varBindList(var_bind, varlist);

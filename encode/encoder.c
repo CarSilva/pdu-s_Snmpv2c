@@ -15,11 +15,7 @@ long id;
 char* ip;
 char* porta;
 char* community;
-char** oid;
 long version;
-char** value;
-int flag[100];
-uint8_t buffer_final[1024];
 
 /*
 int menu_out(uint8_t buffer_final[], long n) {
@@ -280,35 +276,214 @@ int menu_principal() {
 }
 */
 
-void aloca() {
-  int i;
-  value = (char**) malloc(100*sizeof(char *));
-  oid = (char**) malloc(100*sizeof(char *));
-  for(i = 0; i < 100; i++) {
-    value[i] = (char *) malloc(20 * sizeof(char));
-    oid[i] = (char *) malloc(20 * sizeof(char));
-  }
+void buildTypeValue(char *type, char **value, int *flag,
+                    int *indexVal, int *indexflag){
+    char *tok = strtok(type, ":");
+    switch(atoi(tok)){
+        case 1:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 1;
+            break;
+        case 2:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 2;
+            break;
+        case 3:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 3;
+            break;
+        case 4:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 4;
+            break;
+        case 5:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 5;
+            break;
+        case 6:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 6;
+            break;
+        case 7:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 7;
+            break;
+        case 8:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 8;
+            break;
+        case 9:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 9;
+            break;
+        case 10:
+            tok = strtok(NULL, ":\n");
+            value[(*indexVal)++] = tok;
+            flag[(*indexflag)++] = 10;
+            break;
+    }
 }
 
+
+void buildPdu(char *line, char **oid, char **value, int *flag,
+                uint8_t *buffer_final, int *indexflag, 
+                int *indexOid, int *indexVal, int nFields, int *n){
+    char *tok;
+    tok = strtok(line, " ");
+    switch(atoi(tok)){
+        case 1:
+            tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = tok;
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+            }
+            break;
+        case 2:
+            tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = tok;
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+
+            }
+            break;
+        case 3:
+            tok = strtok(NULL, " ");
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+            }
+            break;
+        case 4:
+            tok = strtok(NULL, " ");
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+            }
+            break;
+        case 5:
+            tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = strdup(tok);
+            printf("OID N%s\n",oid[0]);
+            tok = strtok(NULL, " ");
+            char *type = strdup(tok);
+            buildTypeValue(type, value, flag, indexVal, indexflag);
+            if((*indexOid) == nFields){
+                printf("fnal %s\n", oid[0]);
+                printf("fnal %s\n", oid[1]);
+                oid[*indexOid] = NULL;
+                value[*indexVal] = NULL;
+                *n = setRequest(flag, version, community, 5, oid, value, buffer_final);
+            }
+
+            break;
+        case 6:
+            tok = strtok(NULL, " ");
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+            }
+            break;
+        case 7:
+            tok = strtok(NULL, " ");
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+            }
+            break;
+        case 8:
+            tok = strtok(NULL, " ");
+            if((*indexOid) == nFields){
+                oid[*indexOid] = NULL;
+            }
+            break;
+    }
+   
+}
+
+void parseVersionCommunity(char *line, int *nFields){
+    char *tok = strtok(line, " ");
+    *nFields = atoi(tok);
+    tok = strtok(NULL, " ");
+    version = atol(tok);
+    tok = strtok(NULL, " ");
+    community = strdup(tok);
+
+}
+
+void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final, int *n){
+    FILE * fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int indexOid, indexVal, indexflag, index, nFields;
+    indexOid = indexVal = indexflag = index = 0;
+
+    fp = fopen("ConfigFile.txt", "r");
+
+    if (fp == NULL){
+        exit(EXIT_FAILURE);
+    }
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        if(index == 0){
+            parseVersionCommunity(line, &nFields);
+        }else{
+            printf("hey %d\n", indexOid);
+            buildPdu(line, oid, value, flag, buffer_final,
+                &indexflag, &indexOid, &indexVal, nFields,
+                n);
+        }
+        index++;
+    }
+
+    fclose(fp);
+    if (line)
+        free(line);
+}
+
+
+
+
 int main() {
-  //int temp;
+   char **oid, **value;
+    int *flag;
+    uint8_t *buffer_final;
+    int i, n;
+    value = (char**) malloc(100*sizeof(char *));
+    oid = (char**) malloc(100*sizeof(char *));
+    for(i = 0; i < 100; i++) {
+        value[i] = (char *) malloc(1024 * sizeof(char));
+        oid[i] = (char *) malloc(1024 * sizeof(char));
+    }
+    flag = malloc(100*sizeof(int));
+    buffer_final = malloc(1024*sizeof(uint8_t));
+   readFromFile(oid, value, flag, buffer_final, &n);
+
+   for(i = 0; i < 2; i++){
+    printf("OLHA EU %s\n", oid[i]);
+   }
+  //int temp;*/
   //temp = menu_principal();
-  int i, n;
+  //int i, n;
 
-  aloca();
-
+  
+/*
   //testar com diferentes tipos de valores, necessita de o ultimo valor estar a NULL;
-  value[0] = "puat"; /*value[1] = "11";*/ value[1] = NULL;
-  flag[0] = 2;            //flag[1] = 1;
-  oid[0] = "41.2.3.4";     /*oid[1] = "5.6.7.8";*/     oid[1] = NULL;
+  value[0] = "puat"; value[1] = "11"; value[2] = NULL;
+  flag[0] = 2;            flag[1] = 1;
+  oid[0] = "1.2.3.4";     oid[1] = "5.6.7.8";   oid[2] = NULL;
 
   //testar getRequest
   //versão, community, tag, oid, buffer_final
-  //n = getRequest(2, "public", 1, oid, buffer_final);
+ // n = getRequest(2, "public", 1, oid, buffer_final);
 
   n = setRequest(flag, 2, "public", 5, oid, value, buffer_final);
-
-
+*/
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_port = htons(8954);
@@ -331,39 +506,5 @@ int main() {
   while (i != n) {
   printf("%02x ", buffer_final[i] & 0xff);
     i++;
-  }
-  */
-
-
-/*
-Message_t *messaged = 0;
-asn_dec_rval_t rval1 = asn_decode(0, ATS_BER, &asn_DEF_Message,
-                              (void **)&messaged, buffer_final, sizeof(buffer_final)); //tratar erro se der -1
-if(rval1.code ==  RC_FAIL){ //significa que a descodificaçaºo falhou, está a entrar no if nao sei bem porque
-  printf("fail\n");
-}
-printf("Message_SIZE = %d\n",messaged->data.size );
-PDUs_t* pdud = 0;
-asn_dec_rval_t rval2 = asn_decode(0, ATS_BER, &asn_DEF_PDUs,
-                              (void **)&pdud, messaged->data.buf, messaged->data.size); //tratar erro se der -1
-if(rval2.code ==  RC_WMORE){ //significa que a descodificaçaºo falhou, está a entrar no if nao sei bem porque
-  printf("Want More info\n");
-}
-VarBindList_t var_bindingsd = pdud->choice.set_request.variable_bindings;
-printf("List_VarBindings_Size = %d\n", var_bindingsd.list.count);
-VarBind_t* var_bindd = var_bindingsd.list.array[0];
-ObjectName_t* object_named = &(var_bindd->name);
-ObjectSyntax_t* object_syntaxd = &(var_bindd->choice.choice.value);
-int j;
-char temp[1024];
-for(j = 0; j < object_named->size; j++){
-                    temp[j] = object_named->buf[j];
-}
-temp[j] = '\0';
-printf("String = %s\n",temp);
-/*char *str = (char *) object_named->buf;
-char *final = malloc(1024);
-snprintf(final, 1024, "%s%c", str, '\0');
-printf("%s\n", final);
-*/
+  }*/
 }

@@ -31,52 +31,52 @@ void decode(uint8_t *buffer){
     Pdu_Field *fields = decoded->decoded;
     for(i = 0; i < decoded->nFields; i++){
         printf("OID : ");
-        for(j = 0; j <fields->oid->size; j++ ){
-            printf("%x.",  fields->oid->buf[j]);
+        for(j = 0; j < fields[i].oid->size; j++ ){
+            printf("%x.",  fields[i].oid->buf[j]);
         }
         printf("\n");
-         switch(fields->present){
+         switch(fields[i].present){
             case Nothing:
                 printf("Nothing\n");
                 break;
             case Long:
-                printf("Value = %ld\n",fields->fields.value);
+                printf("Value = %ld\n",fields[i].fields.value);
                 break;
             case String:
-                printf("String = %s\n",(char *)fields->fields.string.buf);
+                printf("String = %s\n",(char *)fields[i].fields.string.buf);
                 break;
             case OID:
-                printf("OID = %s\n", (char *)fields->fields.oid.buf);
+                printf("OID = %s\n", (char *)fields[i].fields.oid.buf);
                 break;
             case IpAddress:
-                printf("IpAddress = %s\n", (char *)fields->fields.ip.buf);
+                printf("IpAddress = %s\n", (char *)fields[i].fields.ip.buf);
                 break;
             case Counter:
-                printf("SmallCounter = %ld\n", fields->fields.counter32);
+                printf("SmallCounter = %ld\n", fields[i].fields.counter32);
                 break;
             case Time:
-                printf("TimeTicks %ld\n",fields->fields.time);
+                printf("TimeTicks %ld\n",fields[i].fields.time);
                 break;
             case Arbitraty:
-                printf("Arbitraty = %s\n",(char *) fields->fields.opaque.buf);
+                printf("Arbitraty = %s\n",(char *) fields[i].fields.opaque.buf);
                 break;
             case Big_Counter:
-                printf("Big_Counter = %d\n",fields->fields.counter64);
+                printf("Big_Counter = %d\n",fields[i].fields.counter64);
                 break;
             case Unsign32:
-                printf("Unsign32 = %d\n",fields->fields.unsign32);
+                printf("Unsign32 = %d\n",fields[i].fields.unsign32);
                 break;
             case UnSpecified:
-                printf("UnSpecified... %d\n",fields->fields.unSpecified);
+                printf("UnSpecified... %d\n",fields[i].fields.unSpecified);
                 break;
             case NoSuchObject:
-                printf("No Such Object %d\n", fields->fields.noSuchObject);
+                printf("No Such Object %d\n", fields[i].fields.noSuchObject);
                 break;
             case NoSuchInstance:
-                printf("No Such Instance %d\n", fields->fields.noSuchInstance);
+                printf("No Such Instance %d\n", fields[i].fields.noSuchInstance);
                 break;
             case EndOfMibView:
-                printf("End of Mib View ... %d\n", fields->fields.endOfMibView);
+                printf("End of Mib View ... %d\n", fields[i].fields.endOfMibView);
                 break;
          }
     }

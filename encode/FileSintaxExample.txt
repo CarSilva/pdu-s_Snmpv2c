@@ -1,0 +1,29 @@
+				FILE COMPOSITION EXAMPLE
+N=2 2 public # Number of commands to be executed from a primitive (p.e, get, getNext,...), version and community_string
+5 1.2.3.4 2:ola #Fields= oid value_to_change
+5 1.2.3.4.5 4:192.168.1.1 #same ^^
+
+#If the primitive we want is a get:
+N=1 2 private
+1 1.2.2.2 #Fields=primitive oid
+
+				PRIMITIVES IDs
+1 = get
+2 = getNext
+3 = getBulk
+4 = response
+5 = set
+6 = informe
+7 = trap
+8 = report
+
+				TYPES IDs
+1. Long
+2. String
+3. OID
+4. IpAddress
+5. CounteValue
+6. TimeTicks
+7. Arbitrary_value
+8. BigCounterValue
+9. Unsigned_integer_value
