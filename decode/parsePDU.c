@@ -104,48 +104,56 @@ VarBindList_t getVarBindings(PDUs_t *pdu, Decoded *decoded){
 			decoded->request_id = pdu->choice.get_request.request_id;
 			decoded->error_status = pdu->choice.get_request.error_status;
 			decoded->error_index = pdu->choice.get_request.error_index;
+			decoded->primitiveName = strdup("get");
 			break;
 		case PDUs_PR_get_next_request:
 			var_bindings = pdu->choice.get_next_request.variable_bindings;
 			decoded->request_id = pdu->choice.get_next_request.request_id;
 			decoded->error_status = pdu->choice.get_next_request.error_status;
 			decoded->error_index = pdu->choice.get_next_request.error_index;
+			decoded->primitiveName = strdup("getnext");
 			break;
 		case PDUs_PR_get_bulk_request:
 			var_bindings = pdu->choice.get_bulk_request.variable_bindings;
 			decoded->request_id = pdu->choice.get_bulk_request.request_id;
 			decoded->non_repeaters = pdu->choice.get_bulk_request.non_repeaters;
 			decoded->max_repetitions = pdu->choice.get_bulk_request.max_repetitions;
+			decoded->primitiveName = strdup("getbulk");
 			break;
 		case PDUs_PR_response:
 			var_bindings = pdu->choice.response.variable_bindings;
 			decoded->request_id = pdu->choice.response.request_id;
 			decoded->error_status = pdu->choice.response.error_status;
 			decoded->error_index = pdu->choice.response.error_index;
+			decoded->primitiveName = strdup("response");
 			break;
 		case PDUs_PR_set_request:
 			var_bindings = pdu->choice.set_request.variable_bindings;
 			decoded->request_id = pdu->choice.set_request.request_id;
 			decoded->error_status = pdu->choice.set_request.error_status;
 			decoded->error_index = pdu->choice.set_request.error_index;
+			decoded->primitiveName = strdup("set");
 			break;
 		case PDUs_PR_inform_request:
 			var_bindings = pdu->choice.inform_request.variable_bindings;
 			decoded->request_id = pdu->choice.inform_request.request_id;
 			decoded->error_status = pdu->choice.inform_request.error_status;
 			decoded->error_index = pdu->choice.inform_request.error_index;
+			decoded->primitiveName = strdup("inform");
 			break;	
 		case PDUs_PR_snmpV2_trap:
 			var_bindings = pdu->choice.snmpV2_trap.variable_bindings;
 			decoded->request_id = pdu->choice.snmpV2_trap.request_id;
 			decoded->error_status = pdu->choice.snmpV2_trap.error_status;
 			decoded->error_index = pdu->choice.snmpV2_trap.error_index;
+			decoded->primitiveName = strdup("trap");
 			break;	
 		case PDUs_PR_report:
 			var_bindings = pdu->choice.report.variable_bindings;
 			decoded->request_id = pdu->choice.report.request_id;
 			decoded->error_status = pdu->choice.report.error_status;
 			decoded->error_index = pdu->choice.report.error_index;
+			decoded->primitiveName = strdup("report");
 			break;
 	}	
 

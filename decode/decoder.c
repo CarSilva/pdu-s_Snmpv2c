@@ -8,10 +8,22 @@
 #include<sys/socket.h>
 #include<linux/net.h>
 
+void initDecoded(Decoded *decoded){
+    decoded->nFields = -1;
+    decoded->request_id = -1;
+    decoded->error_status = -1;
+    decoded->error_index = -1;
+    decoded->non_repeaters = -1;
+    decoded->max_repetitions = -1;
+}
 
-void decode(uint8_t *buffer){
+void decode(uint8_t *buffer, char*filename){
+    FILE *f = fopen(filename, "w");
+    if (f == NULL){
+        printf("Error opening file!\n");
+        exit(1);
+    }
     int i,j;
-
     Pdu_Info *info = malloc(sizeof(struct pdu_info));
     buffer_to_PDU(buffer, info);
     if(info->error == -1) {
@@ -22,80 +34,86 @@ void decode(uint8_t *buffer){
         return;
     }
     Decoded *decoded = malloc(sizeof(struct pdu_field));
+    initDecoded(decoded);
     parsePdu(info->pdu, decoded);
-    printf("Version : %ld  ", info->version);
-    printf("Community String %s  ", info->comm);
-    printf("Field number :%d\n", decoded->nFields);
-    //return;
-    //falta imprimir requestid, erros,...
+    fprintf(f, "Version : %ld  ", info->version);
+    fprintf(f, "Community String : %s\n", info->comm);
+    fprintf(f, "%s ", decoded->primitiveName);
+    if(decoded->non_repeaters > 0){
+        fprintf(f, "%ld %ld ",decoded->non_repeaters, decoded->max_repetitions);
+    }
     Pdu_Field *fields = decoded->decoded;
     for(i = 0; i < decoded->nFields; i++){
-        printf("OID : ");
-        for(j = 0; j < fields[i].oid->size; j++ ){
-            printf("%x.",  fields[i].oid->buf[j]);
+        for(j = 0; j < fields[i].oid->size-1; j++ ){
+            fprintf(f, "%x.",  fields[i].oid->buf[j]);
         }
-        printf("\n");
+        fprintf(f, "%x",fields[i].oid->buf[j]);
+        fprintf(f, " ");
          switch(fields[i].present){
             case Nothing:
-                printf("Nothing\n");
+                fprintf(f, "Nothing\n");
                 break;
             case Long:
-                printf("Value = %ld\n",fields[i].fields.value);
+                fprintf(f, "%ld\n",fields[i].fields.value);
                 break;
             case String:
-                printf("String = %s\n",(char *)fields[i].fields.string.buf);
+                fprintf(f, "%s\n",(char *)fields[i].fields.string.buf);
                 break;
             case OID:
-                printf("OID = %s\n", (char *)fields[i].fields.oid.buf);
+                fprintf(f, "%s\n", (char *)fields[i].fields.oid.buf);
                 break;
             case IpAddress:
-                printf("IpAddress = %s\n", (char *)fields[i].fields.ip.buf);
+                fprintf(f, "%s\n", (char *)fields[i].fields.ip.buf);
                 break;
             case Counter:
-                printf("SmallCounter = %ld\n", fields[i].fields.counter32);
+                fprintf(f, "%ld\n", fields[i].fields.counter32);
                 break;
             case Time:
-                printf("TimeTicks %ld\n",fields[i].fields.time);
+                fprintf(f, "%ld\n",fields[i].fields.time);
                 break;
             case Arbitraty:
-                printf("Arbitraty = %s\n",(char *) fields[i].fields.opaque.buf);
+                fprintf(f, "%s\n",(char *) fields[i].fields.opaque.buf);
                 break;
             case Big_Counter:
-                printf("Big_Counter = %d\n",fields[i].fields.counter64);
+                fprintf(f, "%d\n",fields[i].fields.counter64);
                 break;
             case Unsign32:
-                printf("Unsign32 = %d\n",fields[i].fields.unsign32);
+                fprintf(f, "%d\n",fields[i].fields.unsign32);
                 break;
             case UnSpecified:
-                printf("UnSpecified... %d\n",fields[i].fields.unSpecified);
+                fprintf(f, " ");
+                //fprintf(f, "UnSpecified... %d\n",fields[i].fields.unSpecified);
                 break;
             case NoSuchObject:
-                printf("No Such Object %d\n", fields[i].fields.noSuchObject);
+                fprintf(f, "No Such Object %d\n", fields[i].fields.noSuchObject);
                 break;
             case NoSuchInstance:
-                printf("No Such Instance %d\n", fields[i].fields.noSuchInstance);
+                fprintf(f, "No Such Instance %d\n", fields[i].fields.noSuchInstance);
                 break;
             case EndOfMibView:
-                printf("End of Mib View ... %d\n", fields[i].fields.endOfMibView);
+                fprintf(f, "End of Mib View ... %d\n", fields[i].fields.endOfMibView);
                 break;
          }
     }
+    fclose(f);
 }
 
 
-int main(int argc, char const *argv[]) {
+void main(int argc, char const *argv[]) {
+    if(argc != 4){
+        printf("Wrong number of arguments;\nFormat: ./decode [PORT] [FILENAME]\n");
+        return;
+    }
+    int port = atoi(argv[1]);
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(8954);
+    addr.sin_port = htons(port);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     socklen_t udp_socket_size = sizeof(addr);
     bind(sock, (struct sockaddr *)&addr, udp_socket_size);
     uint8_t *buffer = malloc(1024*sizeof(uint8_t));
-    while(1){
-        int recv = recvfrom(sock, buffer, 1024, 0,
-                (struct sockaddr *)&addr,&udp_socket_size);
-        decode(buffer);
-    }
-
+    int recv = recvfrom(sock, buffer, 1024, 0,
+            (struct sockaddr *)&addr,&udp_socket_size);
+    decode(buffer, (char*)argv[2]);
 }

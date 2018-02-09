@@ -47,6 +47,7 @@ typedef struct decoded{
 	long error_index;
 	long non_repeaters;
 	long max_repetitions;
+	char *primitiveName;
 	Pdu_Field *decoded;
 }Decoded;
 

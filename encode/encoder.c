@@ -351,7 +351,7 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
                 uint8_t *buffer_final, int *indexflag, 
                 int *indexOid, int *indexVal, int nFields, int *n){
     char *tok;
-    char *error_status, *error_index;
+    char *error_status, *error_index, *non_repeaters, *max_repetitions;
     int *responseType = malloc(sizeof(int));
     tok = strtok(line, " ");
     switch(atoi(tok)){
@@ -373,14 +373,19 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             break;
         case 3:
             tok = strtok(NULL, " ");
-            //TODO
+            non_repeaters = strdup(tok);
+            tok = strtok(NULL, " ");
+            max_repetitions = strdup(tok);
+            tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = strdup(tok);
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
-
+                *n = getBulkRequest(version, community, 3, oid, atol(non_repeaters),
+                       atol(max_repetitions), buffer_final);
             }
             break;
         case 4:
-            tok = strtok(NULL, " "); //assume-se que só se pode mandar um pdu response
+            tok = strtok(NULL, " ");
             error_status = strdup(tok);
             tok = strtok(NULL, " ");
             error_index = strdup(tok);
@@ -446,11 +451,13 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             break;
         case 8:
             tok = strtok(NULL, " ");
-            //TODO
+            //TODO--NAO cobrir talvez
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
             }
             break;
+        default:
+            printf("Primitive not supported. Error\n");
     }
 }
 
@@ -464,7 +471,8 @@ void parseVersionCommunity(char *line, int *nFields){
 
 }
 
-void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final, int *n){
+void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final,
+                   int *n, char *filename){
     FILE * fp;
     char *line = NULL;
     size_t len = 0;
@@ -472,7 +480,7 @@ void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final, in
     int indexOid, indexVal, indexflag, index, nFields;
     indexOid = indexVal = indexflag = index = 0;
 
-    fp = fopen("ConfigFile.txt", "r");
+    fp = fopen(filename, "r");
 
     if (fp == NULL){
         exit(EXIT_FAILURE);
@@ -496,8 +504,13 @@ void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final, in
 
 
 
-
-int main() {
+void main(int argc, char const *argv[]) {
+    if(argc != 4){
+      printf("Wrong number of arguments;\nFormat: ./encode [IP] [PORT] [FILENANE]\n");
+      return;
+    }
+    char *ip = strdup(argv[1]);
+    int port = atoi(argv[2]);
     char **oid, **value;
     int *flag;
     uint8_t *buffer_final;
@@ -510,7 +523,7 @@ int main() {
     }
     flag = malloc(100*sizeof(int));
     buffer_final = malloc(1024*sizeof(uint8_t));
-    readFromFile(oid, value, flag, buffer_final, &n);
+    readFromFile(oid, value, flag, buffer_final, &n, (char*)argv[3]);
 
   //int temp;*/
   //temp = menu_principal();
@@ -531,8 +544,8 @@ int main() {
 */
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(8954);
-    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = inet_addr(ip);
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     socklen_t udp_socket_size = sizeof(addr);
     int sent = sendto(sock, buffer_final, n, 0, (struct sockaddr *)&addr,
