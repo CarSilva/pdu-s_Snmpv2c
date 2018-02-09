@@ -82,16 +82,16 @@ void decode(uint8_t *buffer, char*filename){
                 break;
             case UnSpecified:
                 fprintf(f, " ");
-                //fprintf(f, "UnSpecified... %d\n",fields[i].fields.unSpecified);
+                fprintf(f, "UnSpecified %d ",fields[i].fields.unSpecified);
                 break;
             case NoSuchObject:
-                fprintf(f, "No Such Object %d\n", fields[i].fields.noSuchObject);
+                fprintf(f, "No Such Object %d ", fields[i].fields.noSuchObject);
                 break;
             case NoSuchInstance:
-                fprintf(f, "No Such Instance %d\n", fields[i].fields.noSuchInstance);
+                fprintf(f, "No Such Instance %d ", fields[i].fields.noSuchInstance);
                 break;
             case EndOfMibView:
-                fprintf(f, "End of Mib View ... %d\n", fields[i].fields.endOfMibView);
+                fprintf(f, "End of Mib View %d ", fields[i].fields.endOfMibView);
                 break;
          }
     }
@@ -100,7 +100,7 @@ void decode(uint8_t *buffer, char*filename){
 
 
 void main(int argc, char const *argv[]) {
-    if(argc != 4){
+    if(argc != 3){
         printf("Wrong number of arguments;\nFormat: ./decode [PORT] [FILENAME]\n");
         return;
     }

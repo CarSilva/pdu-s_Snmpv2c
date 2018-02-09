@@ -398,24 +398,20 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
                 value[*indexVal] = NULL;
                 switch(*responseType){
                     case 1:
-                        *n = response(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value,
-                            1, 0, 0, 0, buffer_final);
+                        *n = responseUnspecified(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value, buffer_final);
                         break;
                     case 2:
-                        *n = response(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value,
-                            0, 2, 0, 0, buffer_final);
+                        *n = responseNoSuchObject(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value, buffer_final);
                         break;
                     case 3:
-                        *n = response(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value,
-                            0, 0, 3, 0, buffer_final);
+                        *n = responseNoSuchInstance(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value, buffer_final);
                         break;
                     case 4:
-                        *n = response(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value,
-                            0, 0, 0, 4, buffer_final);
+                        *n = responseEndOfMibView(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value, buffer_final);
                         break;
                 }
             }

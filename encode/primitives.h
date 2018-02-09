@@ -26,9 +26,15 @@ long getNextRequest(long, char*, long, char**, uint8_t*);
 
 long getBulkRequest(long, char*, long, char**,long, long, uint8_t*);
 
-long response(int[], long, char*, long, char**, long, long, char**, int, int, int, int, uint8_t[]);
+long responseUnspecified(int*, long , char* , long , char**, long, long, char**, uint8_t*);
 
-long setRequest(int[], long, char*, long, char**, char**, uint8_t *);
+long responseNoSuchObject(int*, long , char* , long , char**, long, long, char**, uint8_t*);
+
+long responseNoSuchInstance(int*, long , char* , long , char**, long, long, char**, uint8_t*);
+
+long responseEndOfMibView(int*, long , char* , long , char**, long, long, char**, uint8_t*);
+
+long setRequest(int*, long, char*, long, char**, char**, uint8_t *);
 
 long informRequest(long, char* , long, char**, uint8_t*);
 

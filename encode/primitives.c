@@ -133,37 +133,41 @@ long getBulkRequest(long version, char* community, long tag, char** oid,
   return n;
 }
 
-
 //id = 4
+//PRECISO VER ESTA PARTE; VALUE PARA QUE?
 
 long response(int flag[], long version, char* community, long tag, char**oid, long error_status,
               long index_error, char** value, int unSpecified, int noSuchObject, int noSuchInstance,
             	int endOfMibView, uint8_t buffer_final[]) {
-  int size, i;
+  int size, i, j, sizeOID;
   long n;
   size = sizeArray(value);
-  i = 0;
+  sizeOID = sizeArray(oid);
+  i = j = 0;
   ObjectSyntax_t* object_syntax;
   VarBind_t* var_bind;
   VarBindList_t* varlist = malloc(sizeof(VarBindList_t));
   Response_PDU_t* ResponsePDU;
   PDUs_t* pdu;
   if(size == 0) {
-    if (unSpecified != 0) {
-      var_bind = create_varbind_unspecified(oid[0], var_bind);
-      varlist = add_to_varBindList(var_bind, varlist);
-    }
-    else if(noSuchObject != 0) {
-      var_bind = create_varbind_noSuchObject(oid[0], var_bind);
-      varlist = add_to_varBindList(var_bind, varlist);
-    }
-    else if(noSuchInstance != 0) {
-      var_bind = create_varbind_noSuchInstance(oid[0], var_bind);
-      varlist = add_to_varBindList(var_bind, varlist);
-    }
-    else {
-      var_bind = create_varbind_endOfMibView(oid[0], var_bind);
-      varlist = add_to_varBindList(var_bind, varlist);
+    while(j != sizeOID){
+      if (unSpecified != 0) {
+        var_bind = create_varbind_unspecified(oid[0], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else if(noSuchObject != 0) {
+        var_bind = create_varbind_noSuchObject(oid[0], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else if(noSuchInstance != 0) {
+        var_bind = create_varbind_noSuchInstance(oid[0], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else {
+        var_bind = create_varbind_endOfMibView(oid[0], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      j++;
     }
   }
   else {
@@ -184,6 +188,35 @@ long response(int flag[], long version, char* community, long tag, char**oid, lo
   n = encoding(pdu, version, community, buffer_final);
   return n;
 }
+
+long responseUnspecified(int flag[], long version, char* community, long tag, char**oid, long error_status,
+              long index_error, char** value, uint8_t buffer_final[]) {
+  long n;
+  n = response(flag, version, community, tag, oid, error_status, index_error, value, 1, 0, 0, 0, buffer_final);
+  return n;
+}
+
+long responseNoSuchObject(int flag[], long version, char* community, long tag, char**oid, long error_status,
+              long index_error, char** value, uint8_t buffer_final[]) {
+  long n;
+  n = response(flag, version, community, tag, oid, error_status, index_error, value, 0, 2, 0, 0, buffer_final);
+  return n;
+}
+
+long responseNoSuchInstance(int flag[], long version, char* community, long tag, char**oid, long error_status,
+              long index_error, char** value, uint8_t buffer_final[]) {
+  long n;
+  n = response(flag, version, community, tag, oid, error_status, index_error, value, 0, 0, 3, 0, buffer_final);
+  return n;
+}
+
+long responseEndOfMibView(int flag[], long version, char* community, long tag, char**oid, long error_status,
+              long index_error, char** value, uint8_t buffer_final[]) {
+  long n;
+  n = response(flag, version, community, tag, oid, error_status, index_error, value, 0, 0, 0, 4, buffer_final);
+  return n;
+}
+
 
 //id = 5
 long setRequest(int flag[], long version, char* community, long tag,
