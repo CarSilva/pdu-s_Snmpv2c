@@ -54,31 +54,31 @@ void decode(uint8_t *buffer, char*filename){
                 fprintf(f, "Nothing\n");
                 break;
             case Long:
-                fprintf(f, "%ld\n",fields[i].fields.value);
+                fprintf(f, "%ld ",fields[i].fields.value);
                 break;
             case String:
-                fprintf(f, "%s\n",(char *)fields[i].fields.string.buf);
+                fprintf(f, "%s ",(char *)fields[i].fields.string.buf);
                 break;
             case OID:
-                fprintf(f, "%s\n", (char *)fields[i].fields.oid.buf);
+                fprintf(f, "%s ", (char *)fields[i].fields.oid.buf);
                 break;
             case IpAddress:
-                fprintf(f, "%s\n", (char *)fields[i].fields.ip.buf);
+                fprintf(f, "%s ", (char *)fields[i].fields.ip.buf);
                 break;
             case Counter:
-                fprintf(f, "%ld\n", fields[i].fields.counter32);
+                fprintf(f, "%ld ", fields[i].fields.counter32);
                 break;
             case Time:
-                fprintf(f, "%ld\n",fields[i].fields.time);
+                fprintf(f, "%ld ",fields[i].fields.time);
                 break;
             case Arbitraty:
-                fprintf(f, "%s\n",(char *) fields[i].fields.opaque.buf);
+                fprintf(f, "%s ",(char *) fields[i].fields.opaque.buf);
                 break;
             case Big_Counter:
-                fprintf(f, "%d\n",fields[i].fields.counter64);
+                fprintf(f, "%d ",fields[i].fields.counter64);
                 break;
             case Unsign32:
-                fprintf(f, "%d\n",fields[i].fields.unsign32);
+                fprintf(f, "%d ",fields[i].fields.unsign32);
                 break;
             case UnSpecified:
                 fprintf(f, " ");

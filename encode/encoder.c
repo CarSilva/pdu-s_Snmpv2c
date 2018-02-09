@@ -329,8 +329,11 @@ void buildTypeValue(char *type, char **value, int *flag,
     }
 }
 
-void buildResponseType(int type, int *responseType){
-    switch(type){
+void buildResponseType(char *type, int *responseType, char **value, int *flag,
+                      int *indexVal, int *indexflag){
+    char *typeSave = strdup(type);
+    char *tok = strtok(type, ":");
+    switch(atoi(type)){
         case 1:
             *responseType = 1;
             break;
@@ -343,6 +346,10 @@ void buildResponseType(int type, int *responseType){
         case 4:
             *responseType = 4;
             break;
+        case 5:
+            *responseType = 5;
+            buildTypeValue(typeSave+2, value, flag, indexVal, indexflag);
+            break;
     }
 }
 
@@ -353,6 +360,7 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
     char *tok;
     char *error_status, *error_index, *non_repeaters, *max_repetitions;
     int *responseType = malloc(sizeof(int));
+    char *type;
     tok = strtok(line, " ");
     switch(atoi(tok)){
         case 1:
@@ -392,7 +400,8 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             tok = strtok(NULL, " ");
             oid[(*indexOid)++] = strdup(tok);
             tok = strtok(NULL, " ");
-            buildResponseType(atoi(tok), responseType);
+            type = strdup(tok);
+            buildResponseType(type, responseType, value, flag, indexVal, indexflag);
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
                 value[*indexVal] = NULL;
@@ -412,6 +421,10 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
                     case 4:
                         *n = responseEndOfMibView(flag, version, community, 4, oid,
                             atol(error_status), atol(error_index), value, buffer_final);
+                        break;
+                    case 5:
+                        *n = responseSuccess(flag, version, community, 4, oid, atol(error_status),
+                                        atol(error_index), value, buffer_final);
                         break;
                 }
             }

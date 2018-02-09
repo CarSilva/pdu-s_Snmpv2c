@@ -7,13 +7,16 @@
 1 2 private
 1 1.2.2.2 #Fields=primitive oid
 
-#if the primitive we want is a getBuljk:
+#if the primitive we want is a getBulk:
 1 2 public
 3 1 10 1:1.2.2.21.255 #Fields = primitive non-repeaters max_repetitions NumberOfOids:oid(s)
 
 #if the primitive we want is a response:
 1 2 public
-4 0 0 1.2.3.2 1 #primitive error_status error_index oid typeOfResponse 
+4 0 0 1.2.3.2 5:2:resultFromSomePrimitive #primitive error_status error_index oid typeOfResponse:typeValue:Value
+4 0 0 1.2.2.2 1 #primitive error_status error_index oid typeOfResponse(if response isn't success) 
+
+
 
 				PRIMITIVES IDs
 1 = get
@@ -41,3 +44,4 @@
 2.No such object
 3.No such instance
 4.End of Mib view
+5.Success

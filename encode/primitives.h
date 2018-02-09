@@ -26,6 +26,8 @@ long getNextRequest(long, char*, long, char**, uint8_t*);
 
 long getBulkRequest(long, char*, long, char**,long, long, uint8_t*);
 
+long responseSuccess(int*, long , char* , long , char**, long, long, char**, uint8_t*);
+
 long responseUnspecified(int*, long , char* , long , char**, long, long, char**, uint8_t*);
 
 long responseNoSuchObject(int*, long , char* , long , char**, long, long, char**, uint8_t*);

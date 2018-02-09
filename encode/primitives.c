@@ -189,12 +189,20 @@ long response(int flag[], long version, char* community, long tag, char**oid, lo
   return n;
 }
 
+long responseSuccess(int flag[], long version, char* community, long tag, char**oid, long error_status,
+              long index_error, char** value, uint8_t buffer_final[]) {
+  long n;
+  n = response(flag, version, community, tag, oid, error_status, index_error, value, 0, 0, 0, 0, buffer_final);
+  return n;
+}
+
 long responseUnspecified(int flag[], long version, char* community, long tag, char**oid, long error_status,
               long index_error, char** value, uint8_t buffer_final[]) {
   long n;
   n = response(flag, version, community, tag, oid, error_status, index_error, value, 1, 0, 0, 0, buffer_final);
   return n;
 }
+
 
 long responseNoSuchObject(int flag[], long version, char* community, long tag, char**oid, long error_status,
               long index_error, char** value, uint8_t buffer_final[]) {
