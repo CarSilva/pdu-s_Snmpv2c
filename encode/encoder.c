@@ -10,10 +10,6 @@
 
 
 #define clear() printf("\033[H\033[J")
-
-long id;
-char* ip;
-char* porta;
 char* community;
 long version;
 
@@ -333,11 +329,30 @@ void buildTypeValue(char *type, char **value, int *flag,
     }
 }
 
+void buildResponseType(int type, int *responseType){
+    switch(type){
+        case 1:
+            *responseType = 1;
+            break;
+        case 2:
+            *responseType = 2;
+            break;
+        case 3:
+            *responseType = 3;
+            break;
+        case 4:
+            *responseType = 4;
+            break;
+    }
+}
+
 
 void buildPdu(char *line, char **oid, char **value, int *flag,
                 uint8_t *buffer_final, int *indexflag, 
                 int *indexOid, int *indexVal, int nFields, int *n){
     char *tok;
+    char *error_status, *error_index;
+    int *responseType = malloc(sizeof(int));
     tok = strtok(line, " ");
     switch(atoi(tok)){
         case 1:
@@ -345,6 +360,7 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             oid[(*indexOid)++] = tok;
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
+                *n = getRequest(version, community, 1, oid, buffer_final);
             }
             break;
         case 2:
@@ -352,31 +368,60 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             oid[(*indexOid)++] = tok;
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
-
+                *n = getNextRequest(version, community, 2, oid, buffer_final);
             }
             break;
         case 3:
             tok = strtok(NULL, " ");
+            //TODO
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
+
             }
             break;
         case 4:
+            tok = strtok(NULL, " "); //assume-se que só se pode mandar um pdu response
+            error_status = strdup(tok);
             tok = strtok(NULL, " ");
+            error_index = strdup(tok);
+            tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = strdup(tok);
+            tok = strtok(NULL, " ");
+            buildResponseType(atoi(tok), responseType);
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
+                value[*indexVal] = NULL;
+                switch(*responseType){
+                    case 1:
+                        *n = response(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value,
+                            1, 0, 0, 0, buffer_final);
+                        break;
+                    case 2:
+                        *n = response(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value,
+                            0, 2, 0, 0, buffer_final);
+                        break;
+                    case 3:
+                        *n = response(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value,
+                            0, 0, 3, 0, buffer_final);
+                        break;
+                    case 4:
+                        *n = response(flag, version, community, 4, oid,
+                            atol(error_status), atol(error_index), value,
+                            0, 0, 0, 4, buffer_final);
+                        break;
+                }
             }
             break;
         case 5:
             tok = strtok(NULL, " ");
             oid[(*indexOid)++] = strdup(tok);
-            printf("OID N%s\n",oid[0]);
             tok = strtok(NULL, " ");
             char *type = strdup(tok);
             buildTypeValue(type, value, flag, indexVal, indexflag);
             if((*indexOid) == nFields){
-                printf("fnal %s\n", oid[0]);
-                printf("fnal %s\n", oid[1]);
                 oid[*indexOid] = NULL;
                 value[*indexVal] = NULL;
                 *n = setRequest(flag, version, community, 5, oid, value, buffer_final);
@@ -385,24 +430,28 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             break;
         case 6:
             tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = tok;
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
+                *n = informRequest(version, community, 6, oid, buffer_final);
             }
             break;
         case 7:
             tok = strtok(NULL, " ");
+            oid[(*indexOid)++] = tok;
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
+                *n = trap(version, community, 7, oid, buffer_final);
             }
             break;
         case 8:
             tok = strtok(NULL, " ");
+            //TODO
             if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
             }
             break;
     }
-   
 }
 
 void parseVersionCommunity(char *line, int *nFields){
@@ -433,7 +482,6 @@ void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final, in
         if(index == 0){
             parseVersionCommunity(line, &nFields);
         }else{
-            printf("hey %d\n", indexOid);
             buildPdu(line, oid, value, flag, buffer_final,
                 &indexflag, &indexOid, &indexVal, nFields,
                 n);
@@ -450,7 +498,7 @@ void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final, in
 
 
 int main() {
-   char **oid, **value;
+    char **oid, **value;
     int *flag;
     uint8_t *buffer_final;
     int i, n;
@@ -462,11 +510,8 @@ int main() {
     }
     flag = malloc(100*sizeof(int));
     buffer_final = malloc(1024*sizeof(uint8_t));
-   readFromFile(oid, value, flag, buffer_final, &n);
+    readFromFile(oid, value, flag, buffer_final, &n);
 
-   for(i = 0; i < 2; i++){
-    printf("OLHA EU %s\n", oid[i]);
-   }
   //int temp;*/
   //temp = menu_principal();
   //int i, n;
@@ -484,17 +529,17 @@ int main() {
 
   n = setRequest(flag, 2, "public", 5, oid, value, buffer_final);
 */
-  struct sockaddr_in addr;
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(8954);
-  addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-  int sock = socket(AF_INET, SOCK_DGRAM, 0);
-  socklen_t udp_socket_size = sizeof(addr);
-  int sent = sendto(sock, buffer_final, n, 0, (struct sockaddr *)&addr,
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(8954);
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    socklen_t udp_socket_size = sizeof(addr);
+    int sent = sendto(sock, buffer_final, n, 0, (struct sockaddr *)&addr,
                     udp_socket_size);
 
 
-  printf("%d\n", sent);
+    printf("Sended %d Bytes\n", sent);
   //testar setRequest
 
 

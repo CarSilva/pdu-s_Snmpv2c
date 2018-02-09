@@ -30,4 +30,8 @@ long response(int[], long, char*, long, char**, long, long, char**, int, int, in
 
 long setRequest(int[], long, char*, long, char**, char**, uint8_t *);
 
+long informRequest(long, char* , long, char**, uint8_t*);
+
+long trap(long, char*, long, char**, uint8_t *);
+
 #endif

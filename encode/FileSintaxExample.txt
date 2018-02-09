@@ -1,11 +1,19 @@
 				FILE COMPOSITION EXAMPLE
-N=2 2 public # Number of commands to be executed from a primitive (p.e, get, getNext,...), version and community_string
-5 1.2.3.4 2:ola #Fields= oid value_to_change
+2 2 public # Number of commands to be executed from a primitive (p.e, get, getNext,...), version and community_string
+5 1.2.3.4 2:ola #Fields= primitive oid value_to_change
 5 1.2.3.4.5 4:192.168.1.1 #same ^^
 
 #If the primitive we want is a get:
-N=1 2 private
+1 2 private
 1 1.2.2.2 #Fields=primitive oid
+
+#if the primitive we want is a getBuljk:
+1 2 public
+3 1 10 1:1.2.2.21.255 #Fields = primitive non-repeaters max_repetitions NumberOfOids:oid(s)
+
+#if the primitive we want is a response:
+1 2 public
+4 0 0 1.2.3.2 1 #primitive error_status error_index oid typeOfResponse 
 
 				PRIMITIVES IDs
 1 = get
@@ -27,3 +35,9 @@ N=1 2 private
 7. Arbitrary_value
 8. BigCounterValue
 9. Unsigned_integer_value
+
+				Types of Response
+1.Unspecified
+2.No such object
+3.No such instance
+4.End of Mib view

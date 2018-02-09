@@ -3,7 +3,6 @@
 SimpleSyntax_t* insert_value(long value, SimpleSyntax_t* simple) {
   simple->present = SimpleSyntax_PR_integer_value;
   simple->choice.integer_value = value;
-  printf("%ld\n", simple->choice.integer_value);
   return simple;
 }
 
@@ -54,7 +53,6 @@ SimpleSyntax_t* create_simple(int flag, char* string, SimpleSyntax_t* simple) {
   switch(flag) {
    case 1:
       value = atol(string);
-      printf("%s\n", string);
       simple = insert_value(value, simple);
       break;
    case 2:

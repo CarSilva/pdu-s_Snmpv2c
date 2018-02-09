@@ -43,12 +43,10 @@ long encoding(PDUs_t* pdu, long version, char* community, uint8_t buffer_final[]
   //end teste
   asn_enc_rval_t ret = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_PDUs, pdu,
                                             buffer, 1024);
-  printf("%ld\n", ret.encoded);
   data = create_data(buffer, ret, data);
   message = create_message(data, version, community, message);
   asn_enc_rval_t ret2 = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_Message, message,
                                              buffer_final, 1024);
-  printf("%ld\n", ret2.encoded);
   //teste
   //xer_fprint(fout, &asn_DEF_Message, message);
   //end teste
@@ -147,21 +145,25 @@ long response(int flag[], long version, char* community, long tag, char**oid, lo
   i = 0;
   ObjectSyntax_t* object_syntax;
   VarBind_t* var_bind;
-  VarBindList_t* varlist;
+  VarBindList_t* varlist = malloc(sizeof(VarBindList_t));
   Response_PDU_t* ResponsePDU;
   PDUs_t* pdu;
   if(size == 0) {
     if (unSpecified != 0) {
       var_bind = create_varbind_unspecified(oid[0], var_bind);
+      varlist = add_to_varBindList(var_bind, varlist);
     }
     else if(noSuchObject != 0) {
       var_bind = create_varbind_noSuchObject(oid[0], var_bind);
+      varlist = add_to_varBindList(var_bind, varlist);
     }
     else if(noSuchInstance != 0) {
       var_bind = create_varbind_noSuchInstance(oid[0], var_bind);
+      varlist = add_to_varBindList(var_bind, varlist);
     }
     else {
       var_bind = create_varbind_endOfMibView(oid[0], var_bind);
+      varlist = add_to_varBindList(var_bind, varlist);
     }
   }
   else {
@@ -197,7 +199,6 @@ long setRequest(int flag[], long version, char* community, long tag,
   PDUs_t* pdu;
   while(i != size) {
     object_syntax = decide_object(flag[i], value[i], object_syntax);
-    printf("Dentro %s\n",oid[i] );
     var_bind = create_varbind_value(object_syntax, oid[i], var_bind);
     if(i == 0) {
       varlist = create_varBindList(var_bind, varlist);
@@ -215,7 +216,7 @@ long setRequest(int flag[], long version, char* community, long tag,
 
 
 //id = 6
-long InformRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
+long informRequest(long version, char* community, long tag, char** oid, uint8_t buffer_final[]) {
   int size, i;
   long n;
   size = sizeArray(oid);
