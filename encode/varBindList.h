@@ -6,8 +6,14 @@
 #include <VarBind.h>
 #include <VarBindList.h>
 
+/*
+ * Creates a VarBindList and adds a VarBind to it.
+ */
 VarBindList_t* create_varBindList(VarBind_t*, VarBindList_t*);
 
+/*
+ * Adds a VarBind to a VarBindList
+ */
 VarBindList_t* add_to_varBindList(VarBind_t*, VarBindList_t*);
 
 #endif

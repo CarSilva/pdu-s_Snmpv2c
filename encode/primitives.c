@@ -134,7 +134,6 @@ long getBulkRequest(long version, char* community, long tag, char** oid,
 }
 
 //id = 4
-//PRECISO VER ESTA PARTE; VALUE PARA QUE?
 
 long response(int flag[], long version, char* community, long tag, char**oid, long error_status,
               long index_error, char** value, int unSpecified, int noSuchObject, int noSuchInstance,
