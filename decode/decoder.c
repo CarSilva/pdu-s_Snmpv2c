@@ -44,7 +44,7 @@ void decode(uint8_t *buffer, char*filename){
     }
     fprintf(f, "%s ", decoded->primitiveName);
     if(decoded->non_repeaters > 0){
-        fprintf(f, "%ld %ld ",decoded->non_repeaters, decoded->max_repetitions);
+        fprintf(f, "non repeaters:%ld max repetitions:%ld ",decoded->non_repeaters, decoded->max_repetitions);
     }
     Pdu_Field *fields = decoded->decoded;
     for(i = 0; i < decoded->nFields; i++){
