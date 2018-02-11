@@ -60,10 +60,16 @@ void decode(uint8_t *buffer, char*filename){
                 fprintf(f, "%s ",(char *)fields[i].fields.string.buf);
                 break;
             case OID:
-                fprintf(f, "%s ", (char *)fields[i].fields.oid.buf);
+                for(j = 0; j < fields[i].fields.oid.size-1; j++ ){
+                    fprintf(f, "%x.",  fields[i].fields.oid.buf[j]);
+                }
+                fprintf(f, "%x",fields[i].fields.oid.buf[j]);
                 break;
             case IpAddress:
-                fprintf(f, "%s ", (char *)fields[i].fields.ip.buf);
+                for(j = 0; j < fields[i].fields.ip.size-1; j++){
+                    fprintf(f, "%x.", fields[i].fields.ip.buf[j]);
+                }
+                fprintf(f, "%x ",fields[i].fields.ip.buf[j]);
                 break;
             case Counter:
                 fprintf(f, "%ld ", fields[i].fields.counter32);
@@ -75,7 +81,7 @@ void decode(uint8_t *buffer, char*filename){
                 fprintf(f, "%s ",(char *) fields[i].fields.opaque.buf);
                 break;
             case Big_Counter:
-                fprintf(f, "%d ",fields[i].fields.counter64);//LONG!!!!!!
+                fprintf(f, "%ld ",fields[i].fields.counter64);
                 break;
             case Unsign32:
                 fprintf(f, "%d ",fields[i].fields.unsign32);

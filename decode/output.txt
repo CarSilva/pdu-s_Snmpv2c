@@ -1,3 +1,2 @@
 Version : 2  Community String : public
-
-set 1.2.3.4 ola 1.2.3.4.5 192.168.1.1
+response 1.2.3.2 response 
