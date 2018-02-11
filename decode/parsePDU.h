@@ -2,7 +2,9 @@
 #define _ParsePDU_H_
 
 #include <PDUs.h>
-
+/*
+ * Enum that indicates the type value present in Pdu_Field's struct
+ */
 typedef enum Present {
 	Nothing,
 	Long,
@@ -20,6 +22,9 @@ typedef enum Present {
 	EndOfMibView
 } Present;
 
+/*
+ * Struct that store all the infomation about a VarBind present in some PDU
+ */
 typedef struct pdu_field {
 	ObjectName_t *oid;
 	Present present;
@@ -40,6 +45,11 @@ typedef struct pdu_field {
 	} fields;
 }Pdu_Field;
 
+/*
+ * Struct that stores all the information about a PDU, the id, errors,
+ * arguments, pdu name and all the information extracted from the VarBinds 
+ * that are part of the PDU
+ */
 typedef struct decoded{
 	int nFields;
 	long request_id;
@@ -52,6 +62,10 @@ typedef struct decoded{
 }Decoded;
 
 
+/*
+ * Function that parses any PDU (simple PDU or a BULK PDU) and fills Decoded's struct 
+ * with all the information necessary extracted to the reffered struct
+ */
 void parsePdu(PDUs_t *pdu, Decoded *decoded);
 
 #endif

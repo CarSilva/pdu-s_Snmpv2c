@@ -1,3 +1,3 @@
-Version : 2  Community String : private
+Version : 2  Community String : public
 
-response 1.2.2.2 someResponseFromPrimitive 1.1.1.1 1 
+set 1.2.3.4 ola 1.2.3.4.5 192.168.1.1

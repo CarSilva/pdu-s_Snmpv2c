@@ -2,6 +2,14 @@
 #include <PDUs.h>
 #include <getPDU.h>
 
+long getVersion(Message_t *message){
+	return message->version;
+}
+
+char * getComm(Message_t *message){
+	char *str = (char *) message->community.buf;
+	return str;
+}
 
 void buffer_to_PDU(uint8_t *buffer_final, Pdu_Info *info){
 	Message_t *message = calloc(1, sizeof(Message_t));
@@ -40,11 +48,3 @@ void buffer_to_PDU(uint8_t *buffer_final, Pdu_Info *info){
 	info->comm = getComm(message);
 }
 
-long getVersion(Message_t *message){
-	return message->version;
-}
-
-char * getComm(Message_t *message){
-	char *str = (char *) message->community.buf;
-	return str;
-}

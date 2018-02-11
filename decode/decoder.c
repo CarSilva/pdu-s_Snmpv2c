@@ -75,7 +75,7 @@ void decode(uint8_t *buffer, char*filename){
                 fprintf(f, "%s ",(char *) fields[i].fields.opaque.buf);
                 break;
             case Big_Counter:
-                fprintf(f, "%d ",fields[i].fields.counter64);
+                fprintf(f, "%d ",fields[i].fields.counter64);//LONG!!!!!!
                 break;
             case Unsign32:
                 fprintf(f, "%d ",fields[i].fields.unsign32);

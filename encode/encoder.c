@@ -430,6 +430,7 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             }
             break;
         case 5:
+            
             tok = strtok(NULL, " ");
             oid[(*indexOid)++] = strdup(tok);
             tok = strtok(NULL, " ");
