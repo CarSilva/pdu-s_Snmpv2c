@@ -41,7 +41,7 @@ void decode(uint8_t *buffer, char*filename){
     fprintf(f, "Community String : %s\n", info->comm);
     if(decoded->error_status > -1){
         fprintf(f, "error status:%ld error index:%ld\n",decoded->error_status, decoded->error_index);
-    }
+    } 
     fprintf(f, "%s ", decoded->primitiveName);
     if(decoded->non_repeaters > 0){
         fprintf(f, "non repeaters:%ld max repetitions:%ld ",decoded->non_repeaters, decoded->max_repetitions);

@@ -138,6 +138,7 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
               oid[(*indexOid)++] = strdup(tok);
               if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
+                //aqui fica a 0 nao sei porque
                 *n = getBulkRequest(version, community, 3, oid, atol(non_repeaters),
                        atol(max_repetitions), buffer_final);
               }
