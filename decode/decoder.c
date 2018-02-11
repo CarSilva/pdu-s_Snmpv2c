@@ -18,6 +18,7 @@ void initDecoded(Decoded *decoded){
 }
 
 void decode(uint8_t *buffer, char*filename){
+    long *l = malloc(sizeof(long));
     FILE *f = fopen(filename, "w");
     if (f == NULL){
         printf("Error opening file!\n");
@@ -38,6 +39,9 @@ void decode(uint8_t *buffer, char*filename){
     parsePdu(info->pdu, decoded);
     fprintf(f, "Version : %ld  ", info->version);
     fprintf(f, "Community String : %s\n", info->comm);
+    if(decoded->error_status > -1){
+        fprintf(f, "error status:%ld error index:%ld\n",decoded->error_status, decoded->error_index);
+    }
     fprintf(f, "%s ", decoded->primitiveName);
     if(decoded->non_repeaters > 0){
         fprintf(f, "%ld %ld ",decoded->non_repeaters, decoded->max_repetitions);
@@ -45,9 +49,9 @@ void decode(uint8_t *buffer, char*filename){
     Pdu_Field *fields = decoded->decoded;
     for(i = 0; i < decoded->nFields; i++){
         for(j = 0; j < fields[i].oid->size-1; j++ ){
-            fprintf(f, "%x.",  fields[i].oid->buf[j]);
+            fprintf(f, "%d.",  (int)fields[i].oid->buf[j]);
         }
-        fprintf(f, "%x",fields[i].oid->buf[j]);
+        fprintf(f, "%d",(int)fields[i].oid->buf[j]);
         fprintf(f, " ");
          switch(fields[i].present){
             case Nothing:
@@ -61,14 +65,14 @@ void decode(uint8_t *buffer, char*filename){
                 break;
             case OID:
                 for(j = 0; j < fields[i].fields.oid.size-1; j++ ){
-                    fprintf(f, "%x.",  fields[i].fields.oid.buf[j]);
+                    fprintf(f, "%d.", (int)fields[i].fields.oid.buf[j]);
                 }
-                fprintf(f, "%x",fields[i].fields.oid.buf[j]);
+                fprintf(f, "%d ", (int)fields[i].fields.oid.buf[j]);
                 break;
             case IpAddress:
                 for(j = 0; j < fields[i].fields.ip.size - 1; j++)
                     fprintf(f, "%d.",(int)fields[i].fields.ip.buf[j]);
-                fprintf(f, "%d",(int)fields[i].fields.ip.buf[j]);
+                fprintf(f, "%d ",(int)fields[i].fields.ip.buf[j]);
                 break;
             case Counter:
                 fprintf(f, "%ld ", fields[i].fields.counter32);
@@ -80,7 +84,8 @@ void decode(uint8_t *buffer, char*filename){
                 fprintf(f, "%s ",(char *) fields[i].fields.opaque.buf);
                 break;
             case Big_Counter:
-                fprintf(f, "%ld ",fields[i].fields.counter64);
+                asn_INTEGER2long(&(fields[i].fields.counter64), l);
+                fprintf(f, "%ld ",*l);
                 break;
             case Unsign32:
                 fprintf(f, "%d ",fields[i].fields.unsign32);

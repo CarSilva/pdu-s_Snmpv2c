@@ -1,2 +1,3 @@
 Version : 2  Community String : public
-set 1.2.3.2 1.1.1.1
+error status:0 error index:0
+set 1.12.3.4 123 
