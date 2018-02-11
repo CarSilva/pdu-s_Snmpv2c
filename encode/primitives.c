@@ -33,23 +33,28 @@ ObjectSyntax_t* decide_object(int flag, char* value, ObjectSyntax_t* object_synt
 
 long encoding(PDUs_t* pdu, long version, char* community, uint8_t buffer_final[]) {
   FILE* fout = stdout;
-  uint8_t buffer[1024];
+  uint8_t buffer[1010];
   ANY_t* data;
   Message_t* message;
+
   //teste
   printf("PUD: \n\n");
   xer_fprint(fout, &asn_DEF_PDUs, pdu);
   printf("\n\nEND PUD: \n\n");
   //end teste
+  
   asn_enc_rval_t ret = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_PDUs, pdu,
-                                            buffer, 1024);
+                                            buffer, 1010);
+  if(ret.encoded == -1) {
+    printf("\n\nWarning: PDU truncated\n\n");
+  }
+  else if (ret.encoded > 1010) {
+    printf("\n\nWarning: Too Big!\n\n");
+  }
   data = create_data(buffer, ret, data);
   message = create_message(data, version, community, message);
   asn_enc_rval_t ret2 = asn_encode_to_buffer(0, ATS_BER, &asn_DEF_Message, message,
                                              buffer_final, 1024);
-  //teste
-  //xer_fprint(fout, &asn_DEF_Message, message);
-  //end teste
   return ret2.encoded;
 }
 
