@@ -1,2 +1,2 @@
 Version : 2  Community String : public
-response 1.2.3.2 response 
+set 1.2.3.2 1.1.1.1

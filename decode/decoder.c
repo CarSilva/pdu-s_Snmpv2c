@@ -66,10 +66,9 @@ void decode(uint8_t *buffer, char*filename){
                 fprintf(f, "%x",fields[i].fields.oid.buf[j]);
                 break;
             case IpAddress:
-                for(j = 0; j < fields[i].fields.ip.size-1; j++){
-                    fprintf(f, "%x.", fields[i].fields.ip.buf[j]);
-                }
-                fprintf(f, "%x ",fields[i].fields.ip.buf[j]);
+                for(j = 0; j < fields[i].fields.ip.size - 1; j++)
+                    fprintf(f, "%d.",(int)fields[i].fields.ip.buf[j]);
+                fprintf(f, "%d",(int)fields[i].fields.ip.buf[j]);
                 break;
             case Counter:
                 fprintf(f, "%ld ", fields[i].fields.counter32);
@@ -88,16 +87,16 @@ void decode(uint8_t *buffer, char*filename){
                 break;
             case UnSpecified:
                 fprintf(f, " ");
-                fprintf(f, "UnSpecified %d ",fields[i].fields.unSpecified);
+                fprintf(f, "UnSpecified ");
                 break;
             case NoSuchObject:
-                fprintf(f, "No Such Object %d ", fields[i].fields.noSuchObject);
+                fprintf(f, "No Such Object ");
                 break;
             case NoSuchInstance:
-                fprintf(f, "No Such Instance %d ", fields[i].fields.noSuchInstance);
+                fprintf(f, "No Such Instance ");
                 break;
             case EndOfMibView:
-                fprintf(f, "End of Mib View %d ", fields[i].fields.endOfMibView);
+                fprintf(f, "End of Mib View ");
                 break;
          }
     }

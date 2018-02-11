@@ -153,6 +153,32 @@ long response(int flag[], long version, char* community, long tag, char**oid, lo
   VarBindList_t* varlist = malloc(sizeof(VarBindList_t));
   Response_PDU_t* ResponsePDU;
   PDUs_t* pdu;
+
+  while(i != sizeOID){
+      if (flag[i] == 11 ) {
+        var_bind = create_varbind_unspecified(oid[i], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else if(flag[i] == 12) {
+        var_bind = create_varbind_noSuchObject(oid[i], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else if(flag[i] == 13) {
+        var_bind = create_varbind_noSuchInstance(oid[i], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else if(flag[i] == 14){
+        var_bind = create_varbind_endOfMibView(oid[i], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      else{
+        object_syntax = decide_object(flag[i], value[i], object_syntax);
+        var_bind = create_varbind_value(object_syntax, oid[i], var_bind);
+        varlist = add_to_varBindList(var_bind, varlist);
+      }
+      i++;
+  }/*
+
   if(size == 0) {
     while(j != sizeOID){
       if (unSpecified != 0) {
@@ -186,7 +212,7 @@ long response(int flag[], long version, char* community, long tag, char**oid, lo
       }
       i++;
     }
-  }
+  }*/
   ResponsePDU = create_pdu(ResponsePDU, tag, error_status, index_error, varlist);
   pdu = create_response_pdu(pdu, ResponsePDU);
   n = encoding(pdu, version, community, buffer_final);

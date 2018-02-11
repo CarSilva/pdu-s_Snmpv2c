@@ -27,6 +27,7 @@ void buildTypeValue(char *type, char **value, int *flag,
         case 2:
             tok = strtok(NULL, ":\n");
             value[(*indexVal)++] = tok;
+            printf("%s\n",value[(*indexVal)-1] );
             flag[(*indexflag)++] = 2;
             break;
         case 3:
@@ -79,15 +80,19 @@ void buildResponseType(char *type, int *responseType, char **value, int *flag,
     switch(atoi(type)){
         case 1:
             *responseType = 1;
+            flag[(*indexflag)++] = 11;
             break;
         case 2:
             *responseType = 2;
+            flag[(*indexflag)++] = 12;
             break;
         case 3:
             *responseType = 3;
+            flag[(*indexflag)++] = 13;
             break;
         case 4:
             *responseType = 4;
+            flag[(*indexflag)++] = 14;
             break;
         case 5:
             *responseType = 5;
@@ -148,6 +153,7 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
             else {
               tok = strtok(line, " ");
               oid[(*indexOid)++] = strdup(tok);
+              printf("%s\n",oid[(*indexOid)-1] );
               tok = strtok(NULL, " ");
               type = strdup(tok);
               buildResponseType(type, responseType, value, flag, indexVal, indexflag);
