@@ -104,9 +104,10 @@ void buildResponseType(char *type, int *responseType, char **value, int *flag,
 
 void buildPdu(char *line, char **oid, char **value, int *flag,
                 uint8_t *buffer_final, int *indexflag,
-                int *indexOid, int *indexVal, int nFields, int *n, int tp, int index){
+                int *indexOid, int *indexVal, int nFields, int *n, int tp, int index,
+              long *error_status, long *error_index, long *non_repeaters, long *max_repetitions){
     char *tok;
-    char *error_status, *error_index, *non_repeaters, *max_repetitions;
+  //  char *error_status, *error_index, *non_repeaters, *max_repetitions;
     int *responseType = malloc(sizeof(int));
     char *type;
     switch(tp){
@@ -129,27 +130,26 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
         case 3:
             if(index == 1) {
               tok = strtok(line, " ");
-              non_repeaters = strdup(tok);
+              *non_repeaters = atol(tok);
               tok = strtok(NULL, " ");
-              max_repetitions = strdup(tok);
+              *max_repetitions = atol(tok);
             }
             else {
               tok = strtok(line, " ");
               oid[(*indexOid)++] = strdup(tok);
               if((*indexOid) == nFields){
                 oid[*indexOid] = NULL;
-                //aqui fica a 0 nao sei porque
-                *n = getBulkRequest(version, community, 3, oid, atol(non_repeaters),
-                       atol(max_repetitions), buffer_final);
+                *n = getBulkRequest(version, community, 3, oid, *non_repeaters,
+                       *max_repetitions, buffer_final);
               }
             }
             break;
         case 4:
             if(index == 1) {
               tok = strtok(line, " ");
-              error_status = strdup(tok);
+              *error_status = atol(tok);
               tok = strtok(NULL, " ");
-              error_index = strdup(tok);
+              *error_index = atol(tok);
             }
             else {
               tok = strtok(line, " ");
@@ -164,23 +164,23 @@ void buildPdu(char *line, char **oid, char **value, int *flag,
                   switch(*responseType){
                     case 1:
                         *n = responseUnspecified(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value, buffer_final);
+                            *error_status, *error_index, value, buffer_final);
                         break;
                     case 2:
                         *n = responseNoSuchObject(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value, buffer_final);
+                            *error_status, *error_index, value, buffer_final);
                         break;
                     case 3:
                         *n = responseNoSuchInstance(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value, buffer_final);
+                            *error_status, *error_index, value, buffer_final);
                         break;
                     case 4:
                         *n = responseEndOfMibView(flag, version, community, 4, oid,
-                            atol(error_status), atol(error_index), value, buffer_final);
+                            *error_status, *error_index, value, buffer_final);
                         break;
                     case 5:
-                        *n = responseSuccess(flag, version, community, 4, oid, atol(error_status),
-                                        atol(error_index), value, buffer_final);
+                        *n = responseSuccess(flag, version, community, 4, oid, *error_status,
+                                        *error_index, value, buffer_final);
                         break;
                 }
               }
@@ -246,6 +246,7 @@ void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final,
     ssize_t read;
     int indexOid, indexVal, indexflag, index, nFields;
     indexOid = indexVal = indexflag = index = 0;
+    long error_index, error_status, non_repeaters, max_repetitions;
     fp = fopen(filename, "r");
     if (fp == NULL){
         exit(EXIT_FAILURE);
@@ -256,7 +257,8 @@ void readFromFile(char **oid, char **value, int *flag, uint8_t *buffer_final,
         }else{
             buildPdu(line, oid, value, flag, buffer_final,
                 &indexflag, &indexOid, &indexVal, nFields,
-                n, type, index);
+                n, type, index, &error_status, &error_index,
+                &non_repeaters, &max_repetitions);
         }
         index++;
     }

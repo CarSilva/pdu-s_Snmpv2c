@@ -1,3 +1,2 @@
 Version : 2  Community String : public
-error status:0 error index:0
-set 1.12.3.4 123 
+getbulk non repeaters:1 max repetitions:10 1.12.3.4  UnSpecified 
